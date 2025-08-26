@@ -11,6 +11,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import DashboardOverview from './pages/DashboardOverview';
 import InsuranceCompanies from './pages/InsuranceCompanies';
+import Doctors from './pages/Doctors';
 import { isAuthenticated } from './services/authService';
 import { queryClient } from './lib/queryClient';
 import './lib/dayjs';
@@ -90,6 +91,7 @@ function App() {
           >
             <Route index element={<DashboardOverview />} />
             <Route path="/dashboard/insurance" element={<InsuranceCompanies />} />
+            <Route path="/dashboard/doctors" element={<Doctors />} />
           </Route>
         </Routes>
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ChevronDown, BarChart3, User, Settings, Package, Building2, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ChevronDown, BarChart3, User, Settings, Package, Building2, ShoppingCart, UserPlus } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { useAppStore } from '../../store/useAppStore';
@@ -151,10 +151,10 @@ const DashboardLayout: React.FC = () => {
       hasSubItems: false
     }] : []),
     {
-      id: 'medicines',
-      name: 'Medicines',
-      icon: Package,
-      path: '/dashboard/medicines',
+      id: 'doctors',
+      name: 'Doctors',
+      icon: UserPlus,
+      path: '/dashboard/doctors',
       hasSubItems: false
     },
     {
