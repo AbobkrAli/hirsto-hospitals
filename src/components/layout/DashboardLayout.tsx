@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ChevronDown, BarChart3, User, Settings, Package, Building2, ShoppingCart, UserPlus, Activity, Beaker, ClipboardList } from 'lucide-react';
+import { ArrowLeft, ChevronDown, BarChart3, User, Settings, UserPlus, Activity, Beaker, ClipboardList } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { useAppStore } from '../../store/useAppStore';
@@ -90,7 +90,7 @@ const DashboardLayout: React.FC = () => {
   const isBranch = userType === 'branch';
 
   // Check if pharmacy is a chain pharmacy (only chain pharmacies should see branches)
-  const isChainPharmacy = pharmacyData?.pharmacy_type === 'chain';
+  // const isChainPharmacy = pharmacyData?.pharmacy_type === 'chain';
 
   const handleLogout = async () => {
     try {
@@ -178,21 +178,7 @@ const DashboardLayout: React.FC = () => {
       path: '/dashboard/follow-ups',
       hasSubItems: false
     },
-    {
-      id: 'branches',
-      name: 'Branches',
-      icon: Building2,
-      path: '/dashboard/branches',
-      hasSubItems: false
-    },
-    // Only show Orders for branches or independent pharmacies
-    ...((isBranch || (!isBranch && !isChainPharmacy)) ? [{
-      id: 'orders',
-      name: 'Orders',
-      icon: ShoppingCart,
-      path: '/dashboard/orders',
-      hasSubItems: false
-    }] : []),
+    // Removed Branches and Orders from sidebar
   ];
 
   const clinicItems: SidebarItem[] = [

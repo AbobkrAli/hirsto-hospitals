@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Plus, Activity, Edit, Trash2, AlertCircle, RefreshCw, Eye, Filter } from 'lucide-react';
+import { Plus, Activity, Edit, Trash2, AlertCircle, RefreshCw, Eye, Filter, FileText } from 'lucide-react';
 import Select from 'react-select';
 import Button from '../components/atoms/Button';
 import { DeleteConfirmationModal } from '../components/sections';
 import { InactivePharmacyMessage } from '../components';
 import { usePharmacyData } from '../hooks/usePharmacyData';
-import { useHospitalSurgeries, useDeleteSurgery, type SurgeryData } from '../services/surgeriesService';
+import { useHospitalSurgeries, useDeleteSurgery, useHospitalSurgeryBookings, type SurgeryData, type SurgeryBookingData } from '../services/surgeriesService';
 import AddSurgeryModal from '../components/sections/AddSurgeryModal';
 import EditSurgeryModal from '../components/sections/EditSurgeryModal';
 import ViewSurgeryModal from '../components/sections/ViewSurgeryModal';
+import ViewSurgeryBookingModal from '../components/sections/ViewSurgeryBookingModal';
 
 const TableSkeleton: React.FC = () => (
   <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -35,6 +36,8 @@ const Surgeries: React.FC = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [selected, setSelected] = useState<SurgeryData | null>(null);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<SurgeryBookingData | null>(null);
   const [filters, setFilters] = useState<{ risk_level: string | null; is_active: boolean | null }>({ risk_level: null, is_active: null });
 
   const { data: pharmacyData } = usePharmacyData();
@@ -43,6 +46,7 @@ const Surgeries: React.FC = () => {
   const { data: surgeries = [], isLoading, error, refetch } = useHospitalSurgeries(undefined, { skip: 0, limit: 0, risk_level: filters.risk_level, is_active: filters.is_active });
 
   const deleteSurgery = useDeleteSurgery();
+  const { data: bookings = [], isLoading: isLoadingBookings } = useHospitalSurgeryBookings();
 
   if (isPharmacyInactive) return <InactivePharmacyMessage />;
 
@@ -225,6 +229,47 @@ const Surgeries: React.FC = () => {
         </div>
       )}
 
+      {/* Surgery Bookings Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">Surgery Bookings</h2>
+          {isLoadingBookings && <span className="text-sm text-gray-500">Loading…</span>}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Surgery</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {bookings.map((b) => (
+                <tr key={b.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.patient_name} <span className="text-gray-500">({b.patient_email})</span></td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.surgery?.name ?? b.surgery_id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(b.scheduled_date).toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${b.status === 'completed' ? 'bg-green-100 text-green-800' : b.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{b.status}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button onClick={() => { setSelectedBooking(b); setIsBookingOpen(true); }} className="text-[#1E3E72] hover:text-blue-700 transition-colors" title="View booking">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {(!bookings || bookings.length === 0) && !isLoadingBookings && (
+          <div className="text-center py-8 text-sm text-gray-500">No bookings found</div>
+        )}
+      </div>
+
       <AddSurgeryModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
@@ -250,6 +295,11 @@ const Surgeries: React.FC = () => {
         confirmText="Remove"
         cancelText="Cancel"
         isLoading={deleteSurgery.isPending}
+      />
+      <ViewSurgeryBookingModal
+        isOpen={isBookingOpen}
+        onClose={() => { setIsBookingOpen(false); setSelectedBooking(null); }}
+        booking={selectedBooking}
       />
     </div>
   );

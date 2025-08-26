@@ -43,6 +43,7 @@ export const medicalTestKeys = {
     hospitalId: number,
     params: { test_type?: string | null; department?: string | null; is_active?: boolean | null }
   ) => [...medicalTestKeys.hospital(hospitalId), params.test_type ?? 'all', params.department ?? 'all', params.is_active ?? 'all'] as const,
+  bookings: (hospitalId: number) => [...medicalTestKeys.hospital(hospitalId), 'bookings'] as const,
 };
 
 export const useHospitalMedicalTests = (
@@ -61,6 +62,52 @@ export const useHospitalMedicalTests = (
       if (queryParams.department) search.set('department', String(queryParams.department));
       if (typeof queryParams.is_active !== 'undefined' && queryParams.is_active !== null) search.set('is_active', String(queryParams.is_active));
       const response = await api.get(`/hospitals/${resolvedHospitalId}/medical-tests${search.toString() ? `?${search.toString()}` : ''}`);
+      return response.data;
+    },
+    enabled: !!resolvedHospitalId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export interface TestBookingData {
+  id: number;
+  medical_test_id: number;
+  hospital_id: number;
+  ordering_doctor_id: number;
+  patient_email: string;
+  patient_name: string;
+  patient_phone: string;
+  scheduled_date: string;
+  status: string;
+  urgency_level: string;
+  special_instructions: string;
+  test_results: string;
+  result_values: string;
+  result_interpretation: string;
+  abnormal_findings: string;
+  technician_notes: string;
+  report_file_path: string;
+  result_date: string;
+  insurance_approved: boolean;
+  total_cost: number;
+  created_at?: string;
+  updated_at?: string;
+  medical_test?: MedicalTestData;
+  ordering_doctor?: {
+    id: number; name: string; age: number; email: string; specialization: string; bio: string; phone_number: string; image_url: string; location: string; years_of_experience: number; nationality: string; languages: string; doctor_type: string; is_active: boolean; profile_complete: number; created_at?: string; updated_at?: string;
+  };
+}
+
+export const useHospitalTestBookings = (hospitalId?: number) => {
+  const hospitalIdLocal = JSON.parse(localStorage.getItem('hospitalData') || '{}').id;
+  const resolvedHospitalId = hospitalId ?? hospitalIdLocal;
+  return useQuery({
+    queryKey: medicalTestKeys.bookings(resolvedHospitalId || 0),
+    queryFn: async (): Promise<TestBookingData[]> => {
+      if (!resolvedHospitalId) throw new Error('Hospital ID is required');
+      const response = await api.get(`/hospitals/${resolvedHospitalId}/test-bookings`);
       return response.data;
     },
     enabled: !!resolvedHospitalId,

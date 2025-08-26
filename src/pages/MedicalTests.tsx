@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import { Plus, Beaker, Edit, Trash2, AlertCircle, RefreshCw, Eye, Filter } from 'lucide-react';
+import { Plus, Beaker, Edit, Trash2, AlertCircle, RefreshCw, Eye, Filter, FileText } from 'lucide-react';
 import Select from 'react-select';
 import Button from '../components/atoms/Button';
 import { DeleteConfirmationModal } from '../components/sections';
 import { InactivePharmacyMessage } from '../components';
 import { usePharmacyData } from '../hooks/usePharmacyData';
-import { useHospitalMedicalTests, useDeleteMedicalTest, type MedicalTestData } from '../services/medicalTestsService';
-import AddMedicalTestModal from '../components/sections/AddMedicalTestModal';
-import EditMedicalTestModal from '../components/sections/EditMedicalTestModal';
-import ViewMedicalTestModal from '../components/sections/ViewMedicalTestModal';
+import { useHospitalMedicalTests, useDeleteMedicalTest, useHospitalTestBookings, type MedicalTestData, type TestBookingData } from '../services/medicalTestsService';
+import { AddMedicalTestModal, EditMedicalTestModal, ViewMedicalTestModal, ViewTestBookingModal } from '../components/sections';
 
 const TableSkeleton: React.FC = () => (
   <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -36,6 +34,8 @@ const MedicalTests: React.FC = () => {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [selected, setSelected] = useState<MedicalTestData | null>(null);
   const [filters, setFilters] = useState<{ test_type: string | null; department: string | null; is_active: boolean | null }>({ test_type: null, department: null, is_active: null });
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<TestBookingData | null>(null);
 
   const { data: pharmacyData } = usePharmacyData();
   const isPharmacyInactive = pharmacyData && !pharmacyData.is_active;
@@ -43,6 +43,7 @@ const MedicalTests: React.FC = () => {
   const { data: tests = [], isLoading, error, refetch } = useHospitalMedicalTests(undefined, { test_type: filters.test_type, department: filters.department, is_active: filters.is_active });
 
   const deleteTest = useDeleteMedicalTest();
+  const { data: bookings = [], isLoading: isLoadingBookings } = useHospitalTestBookings();
 
   if (isPharmacyInactive) return <InactivePharmacyMessage />;
 
@@ -186,6 +187,47 @@ const MedicalTests: React.FC = () => {
         </div>
       )}
 
+      {/* Test Bookings Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">Medical Test Bookings</h2>
+          {isLoadingBookings && <span className="text-sm text-gray-500">Loading…</span>}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {bookings.map((b) => (
+                <tr key={b.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.patient_name} <span className="text-gray-500">({b.patient_email})</span></td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.medical_test?.name ?? b.medical_test_id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(b.scheduled_date).toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${b.status === 'completed' ? 'bg-green-100 text-green-800' : b.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{b.status}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button onClick={() => { setSelectedBooking(b); setIsBookingOpen(true); }} className="text-[#1E3E72] hover:text-blue-700 transition-colors" title="View booking">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {(!bookings || bookings.length === 0) && !isLoadingBookings && (
+          <div className="text-center py-8 text-sm text-gray-500">No bookings found</div>
+        )}
+      </div>
+
       <AddMedicalTestModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
@@ -211,6 +253,11 @@ const MedicalTests: React.FC = () => {
         confirmText="Remove"
         cancelText="Cancel"
         isLoading={deleteTest.isPending}
+      />
+      <ViewTestBookingModal
+        isOpen={isBookingOpen}
+        onClose={() => { setIsBookingOpen(false); setSelectedBooking(null); }}
+        booking={selectedBooking}
       />
     </div>
   );
