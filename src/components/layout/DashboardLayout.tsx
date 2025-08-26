@@ -157,14 +157,13 @@ const DashboardLayout: React.FC = () => {
       path: '/dashboard/medicines',
       hasSubItems: false
     },
-    // Only show branches management for chain pharmacies (not branches and not separate pharmacies)
-    ...(!isBranch && isChainPharmacy ? [{
+    {
       id: 'branches',
       name: 'Branches',
       icon: Building2,
       path: '/dashboard/branches',
       hasSubItems: false
-    }] : []),
+    },
     // Only show Orders for branches or independent pharmacies
     ...((isBranch || (!isBranch && !isChainPharmacy)) ? [{
       id: 'orders',
@@ -176,14 +175,13 @@ const DashboardLayout: React.FC = () => {
   ];
 
   const clinicItems: SidebarItem[] = [
-    // Only show profile for pharmacies, not branches
-    ...(!isBranch ? [{
+    {
       id: 'profile',
       name: 'Profile',
       icon: User,
       path: '/dashboard/profile',
       hasSubItems: false
-    }] : [])
+    }
   ];
 
   const isActiveRoute = (path: string) => {
@@ -463,4 +461,4 @@ const DashboardLayout: React.FC = () => {
   );
 };
 
-export default DashboardLayout; 
+export default DashboardLayout;

@@ -20,12 +20,7 @@ export * from './layout';
 
 // Section Components  
 export * from './sections';
-export { default as AvailabilityModal } from './sections/AvailabilityModal';
-export { default as EditAvailabilityModal } from './sections/EditAvailabilityModal';
 export { default as DeleteConfirmationModal } from './sections/DeleteConfirmationModal';
-export { default as CalendarModal } from './sections/CalendarModal';
-export { default as AnalyticsModal } from './sections/AnalyticsModal';
-export { default as PatientReviewsModal } from './sections/PatientReviewsModal';
 export { default as LogoutConfirmationModal } from './sections/LogoutConfirmationModal';
 export { default as RegisterFeatures } from './sections/RegisterFeatures';
 

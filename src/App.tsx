@@ -10,7 +10,6 @@ import { DashboardLayout, ProtectedRoute, InsuranceProtectedRoute, PharmacyOnlyR
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import DashboardOverview from './pages/DashboardOverview';
-import BranchDashboard from './pages/BranchDashboard';
 import InsuranceCompanies from './pages/InsuranceCompanies';
 import Profile from './pages/Profile';
 import { isAuthenticated } from './services/authService';
@@ -94,24 +93,6 @@ function App() {
             }
           >
             <Route index element={<DashboardOverview />} />
-            <Route path="branch" element={<BranchDashboard />} />
-            <Route path="insurance" element={
-              <InsuranceProtectedRoute>
-                <InsuranceCompanies />
-              </InsuranceProtectedRoute>
-            } />
-            <Route path="medicines" element={<Medicine />} />
-            <Route path="branches" element={
-              <ChainPharmacyOnlyRoute>
-                <Branches />
-              </ChainPharmacyOnlyRoute>
-            } />
-            <Route path="orders" element={<Orders />} />
-            <Route path="profile" element={
-              <PharmacyOnlyRoute>
-                <Profile />
-              </PharmacyOnlyRoute>
-            } />
           </Route>
         </Routes>
 
