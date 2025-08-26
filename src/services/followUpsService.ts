@@ -21,9 +21,7 @@ export interface FollowUpDoctor {
   updated_at?: string;
 }
 
-export interface FollowUpSession {
-  // not specified; keep as empty shape for now
-}
+export type FollowUpSession = Record<string, unknown>;
 
 export interface FollowUpData {
   id: number;
