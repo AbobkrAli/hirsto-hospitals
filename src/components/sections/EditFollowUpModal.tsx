@@ -3,6 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, ClipboardList } from 'lucide-react';
 import Button from '../atoms/Button';
 import { useUpdateFollowUp, type UpdateFollowUpRequest, type FollowUpData } from '../../services/followUpsService';
+import { useHospitalSurgeries } from '../../services/surgeriesService';
+import { useHospitalMedicalTests } from '../../services/medicalTestsService';
+import Select from 'react-select';
 
 interface EditFollowUpModalProps {
   isOpen: boolean;
@@ -34,6 +37,8 @@ const EditFollowUpModal: React.FC<EditFollowUpModalProps> = ({ isOpen, onClose, 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const updateMutation = useUpdateFollowUp();
+  const { data: surgeries = [], isLoading: isLoadingSurgeries } = useHospitalSurgeries();
+  const { data: tests = [], isLoading: isLoadingTests } = useHospitalMedicalTests();
 
   useEffect(() => {
     if (isOpen && followUp) {
@@ -184,12 +189,44 @@ const EditFollowUpModal: React.FC<EditFollowUpModalProps> = ({ isOpen, onClose, 
                         {errors.follow_up_type && <p className="text-xs text-red-600 mt-1">{errors.follow_up_type}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Related Surgery ID (optional)</label>
-                        <input name="related_surgery_id" type="number" min={0} value={form.related_surgery_id ?? ''} onChange={handleChange} className="mt-1 w-full border rounded-lg p-2 focus:outline-none border-[#90E0EF]" />
+                        <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Related Surgery (optional)</label>
+                        <Select
+                          classNamePrefix="react-select"
+                          isClearable
+                          isLoading={isLoadingSurgeries}
+                          options={surgeries.map(s => ({ value: s.id, label: s.name }))}
+                          value={(() => {
+                            const id = form.related_surgery_id ?? null;
+                            return id ? { value: id, label: surgeries.find(s => s.id === id)?.name || String(id) } : null;
+                          })()}
+                          onChange={(opt: { value: number; label: string } | null) => setForm(prev => ({ ...prev, related_surgery_id: opt ? opt.value : null }))}
+                          styles={{
+                            control: (provided) => ({ ...provided, border: '1px solid #90E0EF', borderRadius: '0.5rem', minHeight: '36px', boxShadow: 'none', '&:hover': { border: '1px solid #90E0EF' } }),
+                            option: (p, s) => ({ ...p, backgroundColor: s.isSelected ? '#03045E' : s.isFocused ? '#CAF0F8' : 'white', color: s.isSelected ? 'white' : '#1E3E72' }),
+                            menu: (p) => ({ ...p, border: '1px solid #90E0EF', borderRadius: '0.5rem' })
+                          }}
+                          placeholder="Select a surgery"
+                        />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Related Test ID (optional)</label>
-                        <input name="related_test_id" type="number" min={0} value={form.related_test_id ?? ''} onChange={handleChange} className="mt-1 w-full border rounded-lg p-2 focus:outline-none border-[#90E0EF]" />
+                        <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Related Medical Test (optional)</label>
+                        <Select
+                          classNamePrefix="react-select"
+                          isClearable
+                          isLoading={isLoadingTests}
+                          options={tests.map(t => ({ value: t.id, label: t.name }))}
+                          value={(() => {
+                            const id = form.related_test_id ?? null;
+                            return id ? { value: id, label: tests.find(t => t.id === id)?.name || String(id) } : null;
+                          })()}
+                          onChange={(opt: { value: number; label: string } | null) => setForm(prev => ({ ...prev, related_test_id: opt ? opt.value : null }))}
+                          styles={{
+                            control: (provided) => ({ ...provided, border: '1px solid #90E0EF', borderRadius: '0.5rem', minHeight: '36px', boxShadow: 'none', '&:hover': { border: '1px solid #90E0EF' } }),
+                            option: (p, s) => ({ ...p, backgroundColor: s.isSelected ? '#03045E' : s.isFocused ? '#CAF0F8' : 'white', color: s.isSelected ? 'white' : '#1E3E72' }),
+                            menu: (p) => ({ ...p, border: '1px solid #90E0EF', borderRadius: '0.5rem' })
+                          }}
+                          placeholder="Select a medical test"
+                        />
                       </div>
                       <div>
                         <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Initial Consultation Date</label>
