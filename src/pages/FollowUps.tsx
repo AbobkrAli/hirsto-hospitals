@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, ClipboardList, Edit, Trash2, AlertCircle, RefreshCw, Eye, Filter } from 'lucide-react';
+import { Plus, ClipboardList, Edit, Trash2, AlertCircle, RefreshCw, Eye, Filter, PlusCircle } from 'lucide-react';
 import Select from 'react-select';
 import Button from '../components/atoms/Button';
 import { DeleteConfirmationModal } from '../components/sections';
@@ -9,6 +9,7 @@ import { useHospitalFollowUps, useDeleteFollowUp, type FollowUpData } from '../s
 import AddFollowUpModal from '../components/sections/AddFollowUpModal';
 import EditFollowUpModal from '../components/sections/EditFollowUpModal';
 import ViewFollowUpModal from '../components/sections/ViewFollowUpModal';
+import AddFollowUpSessionModal from '../components/sections/AddFollowUpSessionModal';
 
 const TableSkeleton: React.FC = () => (
   <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -36,6 +37,7 @@ const FollowUps: React.FC = () => {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [selected, setSelected] = useState<FollowUpData | null>(null);
   const [filters, setFilters] = useState<{ status: string | null; patient_email: string | null }>({ status: null, patient_email: null });
+  const [isSessionOpen, setIsSessionOpen] = useState(false);
 
   const { data: pharmacyData } = usePharmacyData();
   const isPharmacyInactive = pharmacyData && !pharmacyData.is_active;
@@ -137,6 +139,9 @@ const FollowUps: React.FC = () => {
                         <button onClick={() => { setSelected(fu); setIsViewOpen(true); }} className="text-[#1E3E72] hover:text-blue-700 transition-colors" title="View follow up">
                           <Eye className="w-4 h-4" />
                         </button>
+                        <button onClick={() => { setSelected(fu); setIsSessionOpen(true); }} className="text-emerald-700 hover:text-emerald-900 transition-colors" title="Add session">
+                          <PlusCircle className="w-4 h-4" />
+                        </button>
                         <button onClick={() => { setSelected(fu); setIsEditOpen(true); }} className="text-blue-600 hover:text-blue-800 transition-colors" title="Edit follow up">
                           <Edit className="w-4 h-4" />
                         </button>
@@ -190,6 +195,12 @@ const FollowUps: React.FC = () => {
         isOpen={isViewOpen}
         onClose={() => { setIsViewOpen(false); setSelected(null); }}
         followUp={selected}
+      />
+      <AddFollowUpSessionModal
+        isOpen={isSessionOpen}
+        onClose={() => { setIsSessionOpen(false); setSelected(null); }}
+        onSuccess={() => { setIsSessionOpen(false); setSelected(null); refetch(); }}
+        followUpId={selected?.id ?? null}
       />
       <DeleteConfirmationModal
         isOpen={isDeleteOpen}

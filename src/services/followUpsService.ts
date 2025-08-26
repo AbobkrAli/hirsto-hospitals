@@ -75,8 +75,33 @@ export interface CreateFollowUpRequest {
   total_sessions_planned: number;
 }
 
-export interface UpdateFollowUpRequest extends CreateFollowUpRequest {}
+export type UpdateFollowUpRequest = CreateFollowUpRequest;
 
+export interface CreateFollowUpSessionRequest {
+  follow_up_id: number;
+  session_number: number;
+  session_date: string; // ISO
+  session_type: string; // in_person | remote | ...
+  duration_minutes: number;
+  patient_symptoms: string;
+  vital_signs: string;
+  physical_examination: string;
+  patient_concerns: string;
+  doctor_observations: string;
+  treatment_adjustments: string;
+  medications_prescribed: string;
+  next_session_plan: string;
+  session_outcome: string; // declined | completed | ...
+  patient_compliance: string; // good | poor | ...
+  side_effects_reported: string;
+}
+
+export interface FollowUpSessionData extends CreateFollowUpSessionRequest {
+  id: number;
+  hospital_id: number;
+  created_at?: string;
+  updated_at?: string;
+}
 export const followUpKeys = {
   all: ['follow-ups'] as const,
   hospital: (hospitalId: number) => [...followUpKeys.all, 'hospital', hospitalId] as const,
@@ -146,6 +171,7 @@ export const useUpdateFollowUp = () => {
   });
 };
 
+
 export const useDeleteFollowUp = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -155,6 +181,24 @@ export const useDeleteFollowUp = () => {
       if (!resolvedHospitalId) throw new Error('Hospital ID is required');
       const response = await api.delete(`/hospitals/${resolvedHospitalId}/follow-ups/${followUpId}`);
       return response.data as { message?: string };
+    },
+    onSuccess: (_data, variables) => {
+      const hospitalIdLocal = JSON.parse(localStorage.getItem('hospitalData') || '{}').id;
+      const resolvedHospitalId = variables.hospitalId ?? hospitalIdLocal;
+      if (resolvedHospitalId) queryClient.invalidateQueries({ queryKey: followUpKeys.hospital(resolvedHospitalId) });
+    },
+  });
+};
+
+export const useCreateFollowUpSession = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ hospitalId, data }: { hospitalId?: number; data: CreateFollowUpSessionRequest }) => {
+      const hospitalIdLocal = JSON.parse(localStorage.getItem('hospitalData') || '{}').id;
+      const resolvedHospitalId = hospitalId ?? hospitalIdLocal;
+      if (!resolvedHospitalId) throw new Error('Hospital ID is required');
+      const response = await api.post(`/hospitals/${resolvedHospitalId}/follow-up-sessions`, data);
+      return response.data as FollowUpSessionData;
     },
     onSuccess: (_data, variables) => {
       const hospitalIdLocal = JSON.parse(localStorage.getItem('hospitalData') || '{}').id;
