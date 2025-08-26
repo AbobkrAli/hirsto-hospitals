@@ -1,0 +1,321 @@
+/* Beautiful Material-UI Date Picker Styles */
+.MuiDateCalendar-root {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(144, 224, 239, 0.2);
+  font-family: inherit;
+  padding: 16px;
+  width: 320px;
+}
+
+.MuiPickersLayout-root {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(144, 224, 239, 0.2);
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.MuiPickersLayout-contentWrapper {
+  background: white;
+}
+
+.MuiPickersLayout-toolbar {
+  background: linear-gradient(135deg, #1e3e72 0%, #0077b6 100%);
+  color: white;
+  padding: 16px;
+}
+
+.MuiPickersLayout-toolbarContent {
+  color: white;
+}
+
+.MuiPickersLayout-toolbarTitle {
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.MuiPickersLayout-toolbarText {
+  color: white;
+  font-weight: 600;
+}
+
+.MuiPickersLayout-actionBar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-top: 2px solid rgba(144, 224, 239, 0.2);
+  padding: 12px 16px;
+}
+
+.MuiPickersLayout-actionBarAction {
+  color: #0077b6;
+  font-weight: 600;
+  text-transform: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.MuiPickersLayout-actionBarAction:hover {
+  background: rgba(0, 119, 182, 0.1);
+  transform: translateY(-1px);
+}
+
+.MuiPickersLayout-actionBarAction.MuiButton-contained {
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 119, 182, 0.3);
+}
+
+.MuiPickersLayout-actionBarAction.MuiButton-contained:hover {
+  background: linear-gradient(135deg, #005a8b 0%, #0099cc 100%);
+  box-shadow: 0 6px 16px rgba(0, 119, 182, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Calendar styles */
+.MuiDayCalendar-weekDayLabel {
+  color: #0077b6;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.MuiPickersDay-root {
+  border-radius: 8px;
+  margin: 2px;
+  color: #1e3e72;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.MuiPickersDay-root:hover {
+  background: rgba(0, 119, 182, 0.1);
+  border-color: rgba(0, 119, 182, 0.3);
+  transform: scale(1.05);
+}
+
+.MuiPickersDay-root.Mui-selected {
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+  border-color: #0077b6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 119, 182, 0.3);
+}
+
+.MuiPickersDay-root.Mui-selected:hover {
+  background: linear-gradient(135deg, #005a8b 0%, #0099cc 100%);
+  box-shadow: 0 6px 16px rgba(0, 119, 182, 0.4);
+}
+
+.MuiPickersDay-root.MuiPickersDay-today {
+  background: rgba(0, 119, 182, 0.1);
+  border-color: #0077b6;
+  color: #0077b6;
+  font-weight: 600;
+}
+
+.MuiPickersDay-root.MuiPickersDay-today.Mui-selected {
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+  color: white;
+}
+
+.MuiPickersDay-root.Mui-disabled {
+  color: #cbd5e1;
+  background: transparent;
+}
+
+/* Time picker styles */
+.MuiPickersLayout-contentWrapper .MuiPickersLayout-content {
+  background: white;
+}
+
+.MuiTimeClock-root {
+  background: white;
+}
+
+.MuiClock-root {
+  background: white;
+}
+
+.MuiClockNumber-root {
+  color: #1e3e72;
+  font-weight: 600;
+}
+
+.MuiClockNumber-root.Mui-selected {
+  color: white;
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+}
+
+.MuiClockNumber-root.MuiClockNumber-selected {
+  color: white;
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+}
+
+.MuiClockPointer-root {
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+}
+
+.MuiClockPointer-thumb {
+  background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%);
+  border: 2px solid white;
+}
+
+/* Text field styling */
+.MuiTextField-root .MuiOutlinedInput-root {
+  border-radius: 12px;
+  border: 2px solid rgba(144, 224, 239, 0.5);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  color: #1e3e72;
+  font-weight: 500;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root:hover {
+  border-color: rgba(0, 119, 182, 0.7);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.MuiTextField-root .MuiOutlinedInput-root.Mui-focused {
+  border-color: #0077b6;
+  box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.1);
+  background: white;
+  transform: translateY(-1px);
+}
+
+.MuiTextField-root .MuiOutlinedInput-notchedOutline {
+  border: none;
+}
+
+.MuiTextField-root .MuiInputLabel-root {
+  color: #1e3e72;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.MuiTextField-root .MuiInputLabel-root.Mui-focused {
+  color: #0077b6;
+}
+
+.MuiTextField-root .MuiInputBase-input {
+  color: #1e3e72;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 12px 16px;
+}
+
+.MuiTextField-root .MuiInputBase-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Navigation arrows */
+.MuiPickersArrowSwitcher-root {
+  color: white;
+}
+
+.MuiPickersArrowSwitcher-button {
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.MuiPickersArrowSwitcher-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .MuiDateCalendar-root,
+  .MuiPickersLayout-root {
+    width: 280px;
+    padding: 12px;
+  }
+
+  .MuiPickersLayout-toolbar {
+    padding: 12px;
+  }
+
+  .MuiPickersDay-root {
+    font-size: 13px;
+    min-width: 32px;
+    height: 32px;
+  }
+}
+
+/* Animation for picker opening */
+.MuiPickersLayout-root {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Style ZegoCloud Leave Button to match custom leave button */
+#ZegoRoomLeaveButton {
+  background: #ef4444 !important; /* red-500 */
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  position: fixed !important;
+  bottom: 16px !important;
+  right: 16px !important;
+  z-index: 1000 !important;
+  min-width: 120px !important;
+  text-align: center !important;
+  font-family: inherit !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+#ZegoRoomLeaveButton:hover {
+  background: #dc2626 !important; /* red-600 */
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+#ZegoRoomLeaveButton:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+#ZegoRoomLeaveButton:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Hide any parent containers that might contain the leave button */
+[data-testid*="leave"],
+[class*="leave"],
+[class*="Leave"] {
+  display: none !important;
+}
+
+/* Hide any ZegoCloud leave-related elements */
+.zego-leave-button,
+.zego-leave-view,
+.zego-leaving-view {
+  display: none !important;
+}

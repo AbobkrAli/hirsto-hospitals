@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+/* Custom CSS Variables */
+:root {
+  /* Color Palette */
+  --color-primary: #1e3e72;
+  --color-accent-1: #03045e;
+  --color-accent-2: #0077b6;
+  --color-accent-3: #00b4d8;
+  --color-accent-4: #90e0ef;
+  --color-accent-5: #caf0f8;
+
+  /* Font Families */
+  --font-headlines: "Inter", system-ui, -apple-system, sans-serif;
+  --font-subtitles: "Poppins", system-ui, -apple-system, sans-serif;
+  --font-paragraphs: "Titillium Web", system-ui, -apple-system, sans-serif;
+}
+
+/* Base font settings */
+body {
+  font-family: var(--font-paragraphs);
+}
+
+/* HTML Element Font Assignments */
+h1 {
+  font-family: var(--font-headlines);
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-subtitles);
+}
+
+p {
+  font-family: var(--font-paragraphs);
+}
+
+/* Custom utility classes for consistent styling */
+.font-headlines {
+  font-family: var(--font-headlines);
+}
+
+.font-subtitles {
+  font-family: var(--font-subtitles);
+}
+
+.font-paragraphs {
+  font-family: var(--font-paragraphs);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.border-primary {
+  border-color: var(--color-primary);
+}
+
+/* Gradient utilities */
+.bg-gradient-primary {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent-2) 100%
+  );
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-2) 0%,
+    var(--color-accent-3) 100%
+  );
+}
+
+.text-gradient-primary {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent-2) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
