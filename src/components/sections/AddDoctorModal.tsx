@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, UserPlus } from 'lucide-react';
+import { X } from 'lucide-react';
 import Select from 'react-select';
 import type { MultiValue } from 'react-select';
 import Button from '../atoms/Button';

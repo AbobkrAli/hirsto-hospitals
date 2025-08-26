@@ -32,7 +32,6 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
     side_effects_reported: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const createMutation = useCreateFollowUpSession();
@@ -41,7 +40,6 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
     if (isOpen) {
       setForm((prev) => ({ ...prev, follow_up_id: followUpId || 0 }));
       setIsSubmitting(false);
-      setErrors({});
       setSubmitError(null);
     }
   }, [isOpen, followUpId]);
@@ -76,9 +74,7 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target as HTMLInputElement & { name: string };
     const v = ['session_number', 'duration_minutes', 'follow_up_id'].includes(name) ? Number(value) : value;
-    setForm((prev) => ({ ...prev, [name]: v as any }));
-    const err = validateField(name, v as any);
-    setErrors((prev) => ({ ...prev, [name]: err }));
+    setForm((prev) => ({ ...prev, [name]: v }));
     if (submitError) setSubmitError(null);
   };
 
@@ -89,10 +85,9 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
     ];
     const newErrors: Record<string, string> = {};
     fields.forEach((k) => {
-      const err = validateField(k as string, (form as unknown as Record<string, any>)[k]);
+      const err = validateField(k as string, (form as unknown as Record<string, string | number>)[k]);
       if (err) newErrors[k as string] = err;
     });
-    setErrors(newErrors);
     if (Object.values(newErrors).some(Boolean)) {
       const list = Object.keys(newErrors).join(', ');
       setSubmitError(list ? `Please fix: ${list}` : 'Please fill all required fields correctly.');
@@ -103,8 +98,8 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
       await createMutation.mutateAsync({ data: form });
       onSuccess();
       setSubmitError(null);
-    } catch (err: any) {
-      const message = err?.response?.data?.detail || err?.message || 'Failed to add session';
+    } catch (err: unknown) {
+      const message = (err as any)?.response?.data?.detail || (err as any)?.message || 'Failed to add session';
       setSubmitError(String(message));
     } finally {
       setIsSubmitting(false);

@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
 // Import components from the new structure
-import { DashboardLayout, ProtectedRoute, PharmacyOnlyRoute, ChainPharmacyOnlyRoute } from './components';
+import { DashboardLayout, ProtectedRoute } from './components';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import DashboardOverview from './pages/DashboardOverview';

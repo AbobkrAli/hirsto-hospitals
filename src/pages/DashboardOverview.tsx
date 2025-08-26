@@ -106,13 +106,14 @@ const HospitalAnalyticsDashboard = () => {
             total_appointments: raw.summary?.total_appointments ?? 0,
             completed_appointments: raw.summary?.completed_appointments ?? 0,
             upcoming_appointments: raw.summary?.upcoming_appointments ?? 0,
+            // @ts-expect-error: cancelled_appointments may be present in backend response but not in Summary type
             cancelled_appointments: raw.summary?.cancelled_appointments ?? 0,
             total_patients: raw.summary?.total_patients ?? 0,
-            top_specializations: (raw.summary?.top_specializations ?? []).map((s: any) => ({
+            top_specializations: (raw.summary?.top_specializations ?? []).map((s: { name?: string; specialization?: string; count?: number }) => ({
               name: s?.name ?? s?.specialization ?? 'Unknown',
               count: s?.count ?? 0,
             })),
-            monthly_appointments: (raw.summary?.monthly_appointments ?? []).map((m: any) => ({
+            monthly_appointments: (raw.summary?.monthly_appointments ?? []).map((m: { month?: string; appointments?: number; count?: number }) => ({
               month: m?.month ?? '',
               appointments: m?.appointments ?? m?.count ?? 0,
             })),
@@ -122,7 +123,7 @@ const HospitalAnalyticsDashboard = () => {
               average_surgery_duration: raw.summary?.surgery_analytics?.average_surgery_duration ?? 0,
               total_surgery_revenue: raw.summary?.surgery_analytics?.total_surgery_revenue ?? 0,
               emergency_surgeries: raw.summary?.surgery_analytics?.emergency_surgeries ?? 0,
-              most_common_surgeries: (raw.summary?.surgery_analytics?.most_common_surgeries ?? []).map((x: any) => ({
+              most_common_surgeries: (raw.summary?.surgery_analytics?.most_common_surgeries ?? []).map((x: { name?: string; surgery?: string; count?: number }) => ({
                 name: x?.name ?? x?.surgery ?? 'Unknown',
                 count: x?.count ?? 0,
               })),
@@ -133,7 +134,7 @@ const HospitalAnalyticsDashboard = () => {
               average_turnaround_hours: raw.summary?.test_analytics?.average_turnaround_hours ?? 0,
               abnormal_results: raw.summary?.test_analytics?.abnormal_results ?? 0,
               total_test_revenue: raw.summary?.test_analytics?.total_test_revenue ?? 0,
-              most_common_tests: (raw.summary?.test_analytics?.most_common_tests ?? []).map((x: any) => ({
+              most_common_tests: (raw.summary?.test_analytics?.most_common_tests ?? []).map((x: { name?: string; test?: string; count?: number }) => ({
                 name: x?.name ?? x?.test ?? 'Unknown',
                 count: x?.count ?? 0,
               })),
@@ -143,13 +144,13 @@ const HospitalAnalyticsDashboard = () => {
               patient_satisfaction_average: raw.summary?.follow_up_analytics?.patient_satisfaction_average ?? 0,
               improvement_rate_percentage: raw.summary?.follow_up_analytics?.improvement_rate_percentage ?? 0,
               active_follow_ups: raw.summary?.follow_up_analytics?.active_follow_ups ?? 0,
-              follow_up_types: (raw.summary?.follow_up_analytics?.follow_up_types ?? []).map((x: any) => ({
+              follow_up_types: (raw.summary?.follow_up_analytics?.follow_up_types ?? []).map((x: { name?: string; type?: string; count?: number }) => ({
                 name: x?.name ?? x?.type ?? 'Unknown',
                 count: x?.count ?? 0,
               })),
             },
           },
-          doctors_analytics: (raw.doctors_analytics ?? []).map((d: any) => ({
+          doctors_analytics: (raw.doctors_analytics ?? []).map((d: { doctor_id?: number; doctor_name?: string; specialization?: string; total_appointments?: number; completed_appointments?: number; upcoming_appointments?: number; cancelled_appointments?: number; total_patients?: number; average_rating?: number; total_ratings?: number }) => ({
             doctor_id: d?.doctor_id,
             doctor_name: d?.doctor_name,
             specialization: d?.specialization,
@@ -335,7 +336,7 @@ const HospitalAnalyticsDashboard = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50  backdrop-blur-lg bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50  backdrop-blur-lg  flex items-center justify-center z-50 p-4"
           >
             <motion.div
               initial={{ y: 50, opacity: 0 }}

@@ -208,8 +208,8 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({ isOpen, onClose, onSu
                   </div>
 
                   <div className="flex gap-3 pt-2">
-                    <Button type="button" variant="outline" className="bg-[#03045E] cursor-pointer text-white" onClick={() => !isSubmitting && onClose()} disabled={isSubmitting} className="flex-1">Cancel</Button>
-                    <Button type="submit" disabled={!canSubmit} loading={isSubmitting || updateDoctor.isPending} className="flex-1">Save Changes</Button>
+                    <Button type="button" variant="outline" className="bg-[#03045E] cursor-pointer text-white" onClick={() => !isSubmitting && onClose()} disabled={isSubmitting} >Cancel</Button>
+                    <Button type="submit" disabled={!canSubmit} loading={isSubmitting || updateDoctor.isPending} >Save Changes</Button>
                   </div>
                 </form>
               </div>

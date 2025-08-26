@@ -299,7 +299,7 @@ const AddFollowUpModal: React.FC<AddFollowUpModalProps> = ({ isOpen, onClose, on
 
                     <div className="flex gap-3 pt-2">
                       <Button type="button" variant="outline" className="bg-[#03045E] cursor-pointer text-white flex-1" onClick={() => !isSubmitting && onClose()} disabled={isSubmitting}>Cancel</Button>
-                      <Button type="submit" disabled={!canSubmit || createMutation.isPending} loading={isSubmitting || createMutation.isPending} className="flex-1">Add Follow Up</Button>
+                      <Button type="submit" disabled={!canSubmit || createMutation.isPending} loading={isSubmitting || createMutation.isPending} >Add Follow Up</Button>
                     </div>
                   </form>
                 </div>

@@ -7,12 +7,7 @@ import { toast } from 'react-hot-toast';
 import { useAppStore } from '../../store/useAppStore';
 import { getAuthData, performLogout } from '../../services/authService';
 import { LogoutConfirmationModal } from '../sections';
-import { usePharmacyData } from '../../hooks/usePharmacyData';
-import type { PharmacyData as BasePharmacyData } from '../../services/authService';
-
-type PharmacyData = BasePharmacyData & { logo_url?: string };
 import logoImage from '../../assets/logo.svg';
-import { usePharmacyLogo } from '../../hooks/usePharmacyLogo';
 import type { LucideIcon } from 'lucide-react';
 
 interface SubItem {

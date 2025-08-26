@@ -6,13 +6,10 @@ export { default as LoadingSpinner } from './atoms/LoadingSpinner';
 
 // Molecules
 export { default as Card } from './molecules/Card';
-export { default as AppointmentCard } from './molecules/AppointmentCard';
 export { default as HistoryCard } from './molecules/HistoryCard';
 export { default as FormField, InputFormField, SelectFormField } from './molecules/FormField';
 
 // Organisms
-export { default as AppointmentsList } from './organisms/AppointmentsList';
-export { default as WeeklySchedule } from './organisms/WeeklySchedule';
 export { default as AvailabilityForm } from './organisms/AvailabilityForm';
 
 // Layout Components
@@ -37,6 +34,3 @@ export type { InputProps } from './atoms/Input';
 export type { SelectProps, SelectOption } from './atoms/Select';
 export type { LoadingSpinnerProps } from './atoms/LoadingSpinner';
 export type { CardProps } from './molecules/Card';
-export type { AppointmentCardProps } from './molecules/AppointmentCard';
-export type { AppointmentsListProps } from './organisms/AppointmentsList';
-export type { WeeklyScheduleProps } from './organisms/WeeklySchedule'; 
