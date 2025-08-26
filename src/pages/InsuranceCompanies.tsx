@@ -3,9 +3,13 @@ import { Plus, Building2, Trash2, AlertCircle, RefreshCw } from 'lucide-react';
 import Button from '../components/atoms/Button';
 import { AddInsuranceModal, DeleteConfirmationModal } from '../components/sections';
 import { usePharmacyData } from '../hooks/usePharmacyData';
-import { usePharmacyInsuranceCompanies, useInsuranceCompanies } from '../hooks/useInsurance';
+import {
+  usePharmacyInsuranceCompaniesWithHospitalId,
+  useInsuranceCompanies
+} from '../hooks/useInsurance';
 import { InactivePharmacyMessage } from '../components';
 import type { InsuranceCompany } from '../services/insuranceService';
+import { useRemoveHospitalInsuranceCompany } from '../services/insuranceService';
 
 // Status badge component
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -78,13 +82,16 @@ const InsuranceCompanies: React.FC = () => {
     isLoading: pharmacyInsuranceLoading,
     error: pharmacyInsuranceError,
     refetch
-  } = usePharmacyInsuranceCompanies();
+  } = usePharmacyInsuranceCompaniesWithHospitalId();
 
   // Fetch all available insurance companies for the modal
   const {
     data: allInsuranceCompanies,
     isLoading: allInsuranceLoading
   } = useInsuranceCompanies();
+
+  // Remove insurance mutation (hospital-specific)
+  const removeInsuranceMutation = useRemoveHospitalInsuranceCompany();
 
   // Show inactive message if pharmacy is not active
   if (isPharmacyInactive) {
@@ -117,11 +124,15 @@ const InsuranceCompanies: React.FC = () => {
     if (!companyToDelete) return;
 
     try {
-      // TODO: Implement remove pharmacy insurance company function
-      console.log('Remove insurance company:', companyToDelete.id);
+      const hospitalId = JSON.parse(localStorage.getItem('hospitalData') || '{}').id;
+      if (!hospitalId) {
+        throw new Error('Hospital ID not found');
+      }
+      await removeInsuranceMutation.mutateAsync({ hospitalId, insuranceCompanyId: companyToDelete.id });
       handleDeleteModalClose();
+      refetch();
     } catch {
-      // Error handling
+      // Optional: surface error UI/toast if desired
     }
   };
 
@@ -130,7 +141,11 @@ const InsuranceCompanies: React.FC = () => {
   };
 
   // Get insurance companies data
-  const insuranceCompanies = pharmacyInsuranceCompanies || [];
+  const insuranceCompanies: InsuranceCompany[] = Array.isArray(pharmacyInsuranceCompanies)
+    ? (pharmacyInsuranceCompanies as InsuranceCompany[])
+    : (pharmacyInsuranceCompanies && (pharmacyInsuranceCompanies as any).insurance_companies && Array.isArray((pharmacyInsuranceCompanies as any).insurance_companies)
+      ? ((pharmacyInsuranceCompanies as any).insurance_companies as InsuranceCompany[])
+      : []);
 
   // Loading state
   if (pharmacyInsuranceLoading && !insuranceCompanies.length) {
@@ -163,95 +178,98 @@ const InsuranceCompanies: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Company Name
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact Email
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Policy Types
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
-              {insuranceCompanies.map((company) => (
-                <tr key={company.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                        <Building2 className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {company.name}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {company.contact_email}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {company.policy_types}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge status="active" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button
-                      onClick={() => handleRemoveInsurance(company)}
-                      className="text-red-600 hover:text-red-800 text-sm flex items-center gap-1"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Remove
-                    </button>
-                  </td>
+      {insuranceCompanies.length > 0 ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Company Name
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Contact Email
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Policy Types
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {insuranceCompanies.map((company) => (
+                  <tr key={company.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <Building2 className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {company.name}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {company.contact_email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {company.policy_types}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <StatusBadge status="active" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button
+                        onClick={() => handleRemoveInsurance(company)}
+                        className="text-red-600 hover:text-red-800 text-sm flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
+      ) : null}
 
-        {pharmacyInsuranceError ? (
-          <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load insurance companies</h3>
-            <p className="text-gray-500 mb-4">There was an error loading your insurance companies</p>
-            <Button variant="danger" onClick={handleRetry} className="flex items-center gap-2">
-              <RefreshCw className="w-4 h-4" />
-              Retry
-            </Button>
-          </div>
-        ) : insuranceCompanies.length === 0 ? (
-          <div className="text-center py-12">
-            <Building2 className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No insurance companies found</h3>
-            <p className="text-gray-500 mb-4">You haven't added any insurance companies yet</p>
-            <Button
-              onClick={handleAddInsurance}
-              disabled={allInsuranceLoading}
-              className="flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add Your First Insurance
-            </Button>
-          </div>
-        ) : null}
-      </div>
+      {/* Error or Empty State */}
+      {pharmacyInsuranceError ? (
+        <div className="text-center py-12">
+          <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load insurance companies</h3>
+          <p className="text-gray-500 mb-4">There was an error loading your insurance companies</p>
+          <Button variant="danger" onClick={handleRetry} className="flex items-center gap-2">
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </Button>
+        </div>
+      ) : insuranceCompanies.length === 0 && !pharmacyInsuranceLoading ? (
+        <div className="text-center py-12">
+          <Building2 className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No insurance companies found</h3>
+          <p className="text-gray-500 mb-4">You haven't added any insurance companies yet</p>
+          <Button
+            onClick={handleAddInsurance}
+            disabled={allInsuranceLoading}
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Your First Insurance
+          </Button>
+        </div>
+      ) : null}
 
       {/* Add Insurance Modal */}
       <AddInsuranceModal
@@ -272,7 +290,7 @@ const InsuranceCompanies: React.FC = () => {
         message={`Are you sure you want to remove "${companyToDelete?.name}" from your insurance companies? This action cannot be undone.`}
         confirmText="Remove"
         cancelText="Cancel"
-        isLoading={false}
+        isLoading={removeInsuranceMutation.isPending}
       />
     </div>
   );

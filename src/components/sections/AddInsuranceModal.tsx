@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Building2, Check } from 'lucide-react';
 import Button from '../atoms/Button';
-import { useAssignPharmacyInsuranceCompanies } from '../../hooks/useInsurance';
+import { useAssignPharmacyInsuranceCompaniesWithToast } from '../../hooks/useInsurance';
 import type { InsuranceCompany } from '../../services/insuranceService';
 import Select from 'react-select';
 import type { MultiValue } from 'react-select';
@@ -34,7 +34,7 @@ const AddInsuranceModal: React.FC<AddInsuranceModalProps> = ({
   const [selectedCompanies, setSelectedCompanies] = useState<MultiValue<InsuranceOption>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const assignInsuranceMutation = useAssignPharmacyInsuranceCompanies();
+  const assignInsuranceMutation = useAssignPharmacyInsuranceCompaniesWithToast();
 
   // Reset form when modal opens/closes
   useEffect(() => {
