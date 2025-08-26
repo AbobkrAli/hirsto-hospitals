@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import api from '../utils/api';
+import { useParams } from 'react-router-dom';
 import {
   Users,
   Calendar,
@@ -21,128 +23,51 @@ import {
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart as RechartsPieChart, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Pie } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Mock data based on the API structure
-const mockHospitalData = {
-  hospital_id: 1,
-  hospital_name: "Cairo Medical Center",
-  summary: {
-    total_doctors: 45,
-    active_doctors: 42,
-    total_appointments: 1250,
-    completed_appointments: 1180,
-    upcoming_appointments: 45,
-    cancelled_appointments: 25,
-    total_patients: 890,
-    top_specializations: [
-      { name: "Cardiology", count: 180 },
-      { name: "Orthopedics", count: 165 },
-      { name: "Neurology", count: 142 },
-      { name: "General Surgery", count: 128 },
-      { name: "Pediatrics", count: 115 }
-    ],
-    monthly_appointments: [
-      { month: "Jan", appointments: 95 },
-      { month: "Feb", appointments: 110 },
-      { month: "Mar", appointments: 125 },
-      { month: "Apr", appointments: 140 },
-      { month: "May", appointments: 135 },
-      { month: "Jun", appointments: 150 }
-    ],
-    surgery_analytics: {
-      total_surgeries: 320,
-      completed_surgeries: 295,
-      scheduled_surgeries: 18,
-      cancelled_surgeries: 7,
-      emergency_surgeries: 45,
-      average_surgery_duration: 145,
-      total_surgery_revenue: 485000,
-      success_rate_percentage: 94.5,
-      most_common_surgeries: [
-        { name: "Appendectomy", count: 35 },
-        { name: "Gallbladder Surgery", count: 28 },
-        { name: "Hernia Repair", count: 22 },
-        { name: "Knee Replacement", count: 18 }
-      ]
-    },
-    test_analytics: {
-      total_tests: 2450,
-      completed_tests: 2380,
-      scheduled_tests: 45,
-      cancelled_tests: 25,
-      abnormal_results: 285,
-      total_test_revenue: 125000,
-      average_turnaround_hours: 24,
-      most_common_tests: [
-        { name: "Blood Test", count: 450 },
-        { name: "X-Ray", count: 380 },
-        { name: "MRI", count: 220 },
-        { name: "CT Scan", count: 195 }
-      ]
-    },
-    follow_up_analytics: {
-      total_follow_ups: 580,
-      active_follow_ups: 125,
-      completed_follow_ups: 455,
-      average_sessions_per_follow_up: 3.2,
-      patient_satisfaction_average: 4.6,
-      improvement_rate_percentage: 87.3,
-      follow_up_types: [
-        { name: "Post-Surgery", count: 185 },
-        { name: "Chronic Care", count: 165 },
-        { name: "Rehabilitation", count: 142 },
-        { name: "Preventive", count: 88 }
-      ]
-    }
-  },
-  doctors_analytics: [
-    {
-      doctor_id: 1,
-      doctor_name: "Dr. Ahmed Hassan",
-      specialization: "Cardiology",
-      total_appointments: 85,
-      completed_appointments: 82,
-      upcoming_appointments: 2,
-      cancelled_appointments: 1,
-      total_patients: 65,
-      average_rating: 4.8,
-      total_ratings: 45
-    },
-    {
-      doctor_id: 2,
-      doctor_name: "Dr. Fatma El-Sayed",
-      specialization: "Neurology",
-      total_appointments: 78,
-      completed_appointments: 75,
-      upcoming_appointments: 2,
-      cancelled_appointments: 1,
-      total_patients: 58,
-      average_rating: 4.7,
-      total_ratings: 38
-    },
-    {
-      doctor_id: 3,
-      doctor_name: "Dr. Mohamed Rashad",
-      specialization: "Orthopedics",
-      total_appointments: 92,
-      completed_appointments: 88,
-      upcoming_appointments: 3,
-      cancelled_appointments: 1,
-      total_patients: 72,
-      average_rating: 4.9,
-      total_ratings: 52
-    }
-  ]
-};
-
+// COLORS for charts
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
 
 const HospitalAnalyticsDashboard = () => {
-  const [hospitalData, setHospitalData] = useState(mockHospitalData);
+
+  const [hospitalData, setHospitalData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [doctorsModalOpen, setDoctorsModalOpen] = useState(false);
   const [surgeriesModalOpen, setSurgeriesModalOpen] = useState(false);
   const [testsModalOpen, setTestsModalOpen] = useState(false);
   const [followUpsModalOpen, setFollowUpsModalOpen] = useState(false);
   const [appointmentsModalOpen, setAppointmentsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchHospitalAnalytics = async () => {
+      try {
+        const hospital_id = JSON.parse(localStorage.getItem('hospitalData') || '{}').id;
+        if (!hospital_id) {
+          throw new Error('Missing hospital id');
+        }
+        const response = await api.get(`/hospitals/${hospital_id}/analytics`);
+        setHospitalData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        setLoading(false);
+      }
+    };
+
+    fetchHospitalAnalytics();
+
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!hospitalData) {
+    return <div>No data available</div>;
+  }
 
   const { summary, doctors_analytics } = hospitalData;
 
@@ -621,7 +546,7 @@ const HospitalAnalyticsDashboard = () => {
               <p className="text-xs text-green-600">{summary.active_doctors} active</p>
             </div>
             <div
-              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-100 hover:border-blue-200"
+              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-200 hover:border-blue-200"
               onClick={() => setDoctorsModalOpen(true)}
               title="Click to view doctors analytics"
             >
@@ -638,7 +563,7 @@ const HospitalAnalyticsDashboard = () => {
               <p className="text-xs text-green-600">{appointmentCompletionRate}% completed</p>
             </div>
             <div
-              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-100 hover:border-blue-200"
+              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-200 hover:border-blue-200"
               onClick={() => setAppointmentsModalOpen(true)}
               title="Click to view appointments overview"
             >
@@ -655,7 +580,7 @@ const HospitalAnalyticsDashboard = () => {
               <p className="text-xs text-green-600">{surgerySuccessRate}% success rate</p>
             </div>
             <div
-              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-100 hover:border-blue-200"
+              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-200 hover:border-blue-200"
               onClick={() => setSurgeriesModalOpen(true)}
               title="Click to view surgery analytics"
             >
@@ -672,7 +597,7 @@ const HospitalAnalyticsDashboard = () => {
               <p className="text-xs text-green-600">{testCompletionRate}% completed</p>
             </div>
             <div
-              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-100 hover:border-blue-200"
+              className="p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 hover:scale-110 transition-all duration-200 hover:shadow-md group border border-blue-200 hover:border-blue-200"
               onClick={() => setTestsModalOpen(true)}
               title="Click to view test analytics"
             >

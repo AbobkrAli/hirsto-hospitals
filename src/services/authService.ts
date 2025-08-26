@@ -248,14 +248,7 @@ export const loginDoctor = async (data: LoginData): Promise<AuthResponse> => {
 export const loginPharmacy = async (data: LoginData): Promise<AuthResponse> => {
   try {
     const response = await api.post('/hospitals/login', data);
-
-    // Extract user data from the response
-    const userData = response.data;
-
-    // Store user data in localStorage
-    localStorage.setItem('user', JSON.stringify(userData));
-
-    return userData;
+    return response.data;
   } catch (error: unknown) {
     let errorMessage = 'Login failed';
     
@@ -281,6 +274,7 @@ export const logoutDoctor = (): void => {
   // Clear localStorage
   localStorage.removeItem('authToken');
   localStorage.removeItem('user');
+  localStorage.removeItem('hospitalData');
   
   // Clear any other auth-related data
   localStorage.removeItem('histro-app-storage'); // Zustand persisted storage

@@ -65,31 +65,40 @@ const Login: React.FC = () => {
     try {
       const response = await loginPharmacy(formData);
 
-      if (response.access_token && response.pharmacy) {
-        // Convert pharmacy data to user format for storage
-        const userData = {
-          id: response.pharmacy.id,
-          name: response.pharmacy.name,
+      console.log('DEBUG response', response);
+
+      if (response) {
+        // Convert doctor data to user format for storage
+
+        const HospitalData = {
+          id: response.id || '',
+          name: response.name || '',
           age: 0, // Not applicable for pharmacy
-          email: response.pharmacy.email,
-          specialization: 'Pharmacy',
-          bio: response.pharmacy.bio || '',
-          phone_number: response.pharmacy.phone_number || '',
-          profile_image_url: response.pharmacy.logo_image || '',
-          location: response.pharmacy.location || '',
-          years_of_experience: 0,
-          nationality: '',
-          languages: '',
-          created_at: response.pharmacy.created_at,
-          updated_at: response.pharmacy.updated_at || response.pharmacy.created_at,
+          email: response.email || '',
+          bio: response.bio || '',
+          phone_number: response.phone_number || '',
+
         };
 
-        // Store auth data
-        localStorage.setItem('userType', 'pharmacy');
-        saveAuthData(response.access_token, userData);
+        // Store hospital data in localStorage
+        localStorage.setItem('hospitalData', JSON.stringify(HospitalData));
+        // Save auth data (token and hospital data)
+        saveAuthData(response.access_token, {
+          ...HospitalData,
+          specialization: '', // Not applicable for pharmacy
+          profile_image_url: '', // Not applicable for pharmacy
+          created_at: '', // Not applicable for pharmacy
+          updated_at: '', // Not applicable for pharmacy
+        });
 
-        // Also update Zustand store
-        login(userData, response.access_token);
+        // Also update Zustand store with required User fields
+        login({
+          ...HospitalData,
+          specialization: '',
+          profile_image_url: '',
+          created_at: '',
+          updated_at: '',
+        }, response.access_token);
 
         // Check if pharmacy is active
         toast.success('Welcome back! Pharmacy login successful.');
@@ -418,4 +427,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;
