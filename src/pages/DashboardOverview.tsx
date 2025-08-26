@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { useParams } from 'react-router-dom';
 import {
   Users,
   Calendar,
@@ -26,11 +25,64 @@ import { motion, AnimatePresence } from 'framer-motion';
 // COLORS for charts
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
 
+type DoctorsAnalyticsItem = {
+  doctor_id: number;
+  doctor_name: string;
+  specialization: string;
+  average_rating: number;
+  total_ratings: number;
+  total_appointments: number;
+  completed_appointments: number;
+  total_patients: number;
+  upcoming_appointments: number;
+  cancelled_appointments: number;
+};
+
+type Summary = {
+  total_doctors: number;
+  active_doctors: number;
+  total_appointments: number;
+  completed_appointments: number;
+  total_patients: number;
+  upcoming_appointments: number;
+  monthly_appointments: Array<{ month: string; appointments: number }>;
+  top_specializations: Array<{ name: string; count: number }>;
+  surgery_analytics: {
+    total_surgeries: number;
+    success_rate_percentage: number;
+    average_surgery_duration: number;
+    total_surgery_revenue: number;
+    emergency_surgeries: number;
+    most_common_surgeries: Array<{ name: string; count: number }>;
+  };
+  test_analytics: {
+    total_tests: number;
+    completed_tests: number;
+    average_turnaround_hours: number;
+    abnormal_results: number;
+    total_test_revenue: number;
+    most_common_tests: Array<{ name: string; count: number }>;
+  };
+  follow_up_analytics: {
+    average_sessions_per_follow_up: number;
+    patient_satisfaction_average: number;
+    improvement_rate_percentage: number;
+    active_follow_ups: number;
+    follow_up_types: Array<{ name: string; count: number }>;
+  };
+};
+
+type HospitalAnalytics = {
+  hospital_name: string;
+  summary: Summary;
+  doctors_analytics: DoctorsAnalyticsItem[];
+};
+
 const HospitalAnalyticsDashboard = () => {
 
-  const [hospitalData, setHospitalData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [hospitalData, setHospitalData] = useState<HospitalAnalytics | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [doctorsModalOpen, setDoctorsModalOpen] = useState(false);
   const [surgeriesModalOpen, setSurgeriesModalOpen] = useState(false);
   const [testsModalOpen, setTestsModalOpen] = useState(false);
@@ -57,8 +109,141 @@ const HospitalAnalyticsDashboard = () => {
 
   }, []);
 
+  // Skeleton Loading Component
+  const DashboardSkeleton = () => {
+    return (
+      <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto animate-pulse">
+        {/* Header Skeleton */}
+        <div className="mb-8">
+          <div className="h-8 bg-gray-200 rounded-lg w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+
+        {/* Key Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-20"></div>
+                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                  <div className="h-3 bg-gray-200 rounded w-24"></div>
+                </div>
+                <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Actions Skeleton */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-5 h-5 bg-gray-200 rounded"></div>
+            <div className="h-6 bg-gray-200 rounded w-32"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                  <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                </div>
+                <div className="h-5 bg-gray-200 rounded w-24 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-20"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Performance Metrics Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-6 bg-gray-200 rounded w-40"></div>
+              <div className="w-5 h-5 bg-gray-200 rounded"></div>
+            </div>
+            <div className="h-64 bg-gray-200 rounded-lg"></div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-6 bg-gray-200 rounded w-36"></div>
+              <div className="w-5 h-5 bg-gray-200 rounded"></div>
+            </div>
+            <div className="h-64 bg-gray-200 rounded-lg"></div>
+          </div>
+        </div>
+
+        {/* Top Doctors Performance Skeleton */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="h-6 bg-gray-200 rounded w-48"></div>
+            <div className="h-4 bg-gray-200 rounded w-20"></div>
+          </div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-32"></div>
+                  <div className="h-3 bg-gray-200 rounded w-24"></div>
+                </div>
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-200 rounded w-20"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Stats Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>
+                <div className="text-right">
+                  <div className="h-8 bg-gray-200 rounded w-16 mb-1"></div>
+                  <div className="h-4 bg-gray-200 rounded w-20"></div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <div className="h-3 bg-gray-200 rounded w-24"></div>
+                  <div className="h-3 bg-gray-200 rounded w-16"></div>
+                </div>
+                <div className="flex justify-between">
+                  <div className="h-3 bg-gray-200 rounded w-20"></div>
+                  <div className="h-3 bg-gray-200 rounded w-16"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Key Performance Indicators Skeleton */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="h-6 bg-gray-200 rounded w-48"></div>
+            <div className="w-5 h-5 bg-gray-200 rounded"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-200 rounded-xl mb-3"></div>
+                <div className="h-8 bg-gray-200 rounded w-16 mx-auto mb-1"></div>
+                <div className="h-4 bg-gray-200 rounded w-24 mx-auto"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return <DashboardSkeleton />;
   }
 
   if (error) {
@@ -77,7 +262,7 @@ const HospitalAnalyticsDashboard = () => {
   const testCompletionRate = ((summary.test_analytics.completed_tests / summary.test_analytics.total_tests) * 100).toFixed(1);
 
   // Modal Components
-  const DoctorsModal = ({ isOpen, onClose }) => {
+  const DoctorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     return (
       <AnimatePresence>
         {isOpen && (
@@ -156,7 +341,7 @@ const HospitalAnalyticsDashboard = () => {
 
                 {/* Doctor Cards */}
                 <div className="grid gap-6">
-                  {doctors_analytics.map((doctor, index) => {
+                  {doctors_analytics.map((doctor) => {
                     const completionRate = ((doctor.completed_appointments / doctor.total_appointments) * 100).toFixed(1);
                     return (
                       <div key={doctor.doctor_id} className="bg-gradient-to-r from-white to-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
@@ -236,7 +421,7 @@ const HospitalAnalyticsDashboard = () => {
     );
   };
 
-  const SurgeriesModal = ({ isOpen, onClose }) => {
+  const SurgeriesModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     return (
       <AnimatePresence>
         {isOpen && (
@@ -298,7 +483,7 @@ const HospitalAnalyticsDashboard = () => {
     );
   };
 
-  const TestsModal = ({ isOpen, onClose }) => {
+  const TestsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     return (
       <AnimatePresence>
         {isOpen && (
@@ -325,7 +510,7 @@ const HospitalAnalyticsDashboard = () => {
                 </div>
               </div>
               <div className="p-6 overflow-y-auto max-h-[70vh]">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                   <div className="bg-blue-50 rounded-xl p-4 text-center">
                     <p className="text-3xl font-bold text-blue-600">{summary.test_analytics.average_turnaround_hours}h</p>
                     <p className="text-sm text-gray-600">Avg Turnaround</p>
@@ -356,7 +541,7 @@ const HospitalAnalyticsDashboard = () => {
                             dataKey="count"
                             nameKey="name"
                           >
-                            {summary.test_analytics.most_common_tests.map((entry, index) => (
+                            {summary.test_analytics.most_common_tests.map((_, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                           </Pie>
@@ -368,7 +553,7 @@ const HospitalAnalyticsDashboard = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Common Tests</h3>
                     <div className="space-y-3">
-                      {summary.test_analytics.most_common_tests.map((test, index) => (
+                      {summary.test_analytics.most_common_tests.map((test) => (
                         <div key={test.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <span className="font-medium text-gray-900">{test.name}</span>
                           <span className="text-blue-600 font-semibold">{test.count}</span>
@@ -385,7 +570,7 @@ const HospitalAnalyticsDashboard = () => {
     );
   };
 
-  const FollowUpsModal = ({ isOpen, onClose }) => {
+  const FollowUpsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     return (
       <AnimatePresence>
         {isOpen && (
@@ -454,7 +639,7 @@ const HospitalAnalyticsDashboard = () => {
     );
   };
 
-  const AppointmentsModal = ({ isOpen, onClose }) => {
+  const AppointmentsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     return (
       <AnimatePresence>
         {isOpen && (
@@ -500,10 +685,10 @@ const HospitalAnalyticsDashboard = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Specializations</h3>
                     <div className="space-y-3">
-                      {summary.top_specializations.map((spec, index) => (
+                      {summary.top_specializations.map((spec) => (
                         <div key={spec.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-3">
-                            <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                            <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: COLORS[0] }}></div>
                             <span className="font-medium text-gray-900">{spec.name}</span>
                           </div>
                           <span className="text-blue-600 font-semibold">{spec.count}</span>
