@@ -18,7 +18,7 @@ import {
   PieChart,
   Target
 } from 'lucide-react';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart as RechartsPieChart, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart as RechartsPieChart, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Pie } from 'recharts';
 
 // Mock data based on the API structure
 const mockHospitalData = {
@@ -155,45 +155,144 @@ const HospitalAnalyticsDashboard = () => {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
+      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
+        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+
+        <div className="bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Doctors Analytics</h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Doctors Performance Analytics</h2>
+                <p className="text-blue-100 text-sm mt-1">Comprehensive overview of all medical staff</p>
+              </div>
+              <button
+                onClick={onClose}
+                className="text-white hover:text-blue-200 bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all duration-200"
+              >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
+
           <div className="p-6 overflow-y-auto max-h-[70vh]">
-            <div className="grid gap-4">
-              {doctors_analytics.map((doctor) => (
-                <div key={doctor.doctor_id} className="bg-gray-50 rounded-xl p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{doctor.doctor_name}</h3>
-                      <p className="text-sm text-blue-600">{doctor.specialization}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-900">{doctor.total_appointments}</p>
-                      <p className="text-xs text-gray-500">Total Appointments</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-900">{doctor.total_patients}</p>
-                      <p className="text-xs text-gray-500">Total Patients</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                        <p className="text-lg font-bold text-gray-900">{doctor.average_rating}</p>
-                      </div>
-                      <p className="text-xs text-gray-500">({doctor.total_ratings} reviews)</p>
-                    </div>
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-green-700 font-medium">Active Doctors</p>
+                    <p className="text-2xl font-bold text-green-800">{summary.active_doctors}</p>
+                  </div>
+                  <div className="p-3 bg-green-200 rounded-lg">
+                    <UserCheck className="w-5 h-5 text-green-700" />
                   </div>
                 </div>
-              ))}
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-blue-700 font-medium">Avg Rating</p>
+                    <p className="text-2xl font-bold text-blue-800">
+                      {(doctors_analytics.reduce((acc, d) => acc + d.average_rating, 0) / doctors_analytics.length).toFixed(1)}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-blue-200 rounded-lg">
+                    <Star className="w-5 h-5 text-blue-700" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-purple-700 font-medium">Total Patients</p>
+                    <p className="text-2xl font-bold text-purple-800">
+                      {doctors_analytics.reduce((acc, d) => acc + d.total_patients, 0)}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-purple-200 rounded-lg">
+                    <Users className="w-5 h-5 text-purple-700" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Doctor Cards */}
+            <div className="grid gap-6">
+              {doctors_analytics.map((doctor, index) => {
+                const completionRate = ((doctor.completed_appointments / doctor.total_appointments) * 100).toFixed(1);
+                return (
+                  <div key={doctor.doctor_id} className="bg-gradient-to-r from-white to-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-4">
+
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">{doctor.doctor_name}</h3>
+                          <p className="text-blue-600 font-medium">{doctor.specialization}</p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                            <span className="text-sm font-medium text-gray-700">{doctor.average_rating}</span>
+                            <span className="text-sm text-gray-500">({doctor.total_ratings} reviews)</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {completionRate}% Completion Rate
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="bg-white rounded-xl p-4 border border-gray-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Calendar className="w-4 h-4 text-blue-600" />
+                          <p className="text-xs font-medium text-gray-600">Appointments</p>
+                        </div>
+                        <p className="text-2xl font-bold text-gray-900">{doctor.total_appointments}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div
+                              className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                              style={{ width: `${completionRate}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-xl p-4 border border-gray-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="w-4 h-4 text-purple-600" />
+                          <p className="text-xs font-medium text-gray-600">Patients</p>
+                        </div>
+                        <p className="text-2xl font-bold text-gray-900">{doctor.total_patients}</p>
+                        <p className="text-xs text-gray-500 mt-2">Unique patients served</p>
+                      </div>
+
+                      <div className="bg-white rounded-xl p-4 border border-gray-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Clock className="w-4 h-4 text-orange-600" />
+                          <p className="text-xs font-medium text-gray-600">Upcoming</p>
+                        </div>
+                        <p className="text-2xl font-bold text-gray-900">{doctor.upcoming_appointments}</p>
+                        <p className="text-xs text-gray-500 mt-2">Scheduled ahead</p>
+                      </div>
+
+                      <div className="bg-white rounded-xl p-4 border border-gray-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Activity className="w-4 h-4 text-red-600" />
+                          <p className="text-xs font-medium text-gray-600">Cancelled</p>
+                        </div>
+                        <p className="text-2xl font-bold text-gray-900">{doctor.cancelled_appointments}</p>
+                        <p className="text-xs text-gray-500 mt-2">Cancellation rate: {((doctor.cancelled_appointments / doctor.total_appointments) * 100).toFixed(1)}%</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -205,7 +304,9 @@ const HospitalAnalyticsDashboard = () => {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
+        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+
         <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -255,7 +356,9 @@ const HospitalAnalyticsDashboard = () => {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
+        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+
         <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -291,7 +394,7 @@ const HospitalAnalyticsDashboard = () => {
                     <RechartsPieChart>
                       <Tooltip />
                       <Legend />
-                      <pie
+                      <Pie
                         data={summary.test_analytics.most_common_tests}
                         cx="50%"
                         cy="50%"
@@ -302,7 +405,7 @@ const HospitalAnalyticsDashboard = () => {
                         {summary.test_analytics.most_common_tests.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
-                      </pie>
+                      </Pie>
                     </RechartsPieChart>
                   </ResponsiveContainer>
                 </div>
@@ -330,7 +433,10 @@ const HospitalAnalyticsDashboard = () => {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
+        <div className="fixed inset-0 -z-[10]  flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+
         <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -387,7 +493,10 @@ const HospitalAnalyticsDashboard = () => {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 !z-[60] flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
+        <div className="fixed inset-0 -z-[10]  flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+
         <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">

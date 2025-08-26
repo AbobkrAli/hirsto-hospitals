@@ -6,18 +6,14 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
 // Import components from the new structure
-import { DashboardLayout, ProtectedRoute, InsuranceProtectedRoute, PharmacyOnlyRoute, ChainPharmacyOnlyRoute } from './components';
+import { DashboardLayout, ProtectedRoute, PharmacyOnlyRoute, ChainPharmacyOnlyRoute } from './components';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import DashboardOverview from './pages/DashboardOverview';
 import InsuranceCompanies from './pages/InsuranceCompanies';
-import Profile from './pages/Profile';
 import { isAuthenticated } from './services/authService';
 import { queryClient } from './lib/queryClient';
-import './lib/dayjs'; // Initialize dayjs plugins
-import Medicine from './pages/Medicine';
-import Branches from './pages/Branches';
-import Orders from './pages/Orders';
+import './lib/dayjs';
 import Home from './pages/Home';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
@@ -93,6 +89,7 @@ function App() {
             }
           >
             <Route index element={<DashboardOverview />} />
+            <Route path="/dashboard/insurance" element={<InsuranceCompanies />} />
           </Route>
         </Routes>
 
