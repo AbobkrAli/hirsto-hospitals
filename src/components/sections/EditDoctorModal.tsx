@@ -172,7 +172,7 @@ const EditDoctorModal: React.FC<EditDoctorModalProps> = ({ isOpen, onClose, onSu
                     </div>
                     <div>
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Phone Number</label>
-                      <input name="phone_number" inputMode="numeric" pattern="^\\d{1,15}$" maxLength={15} value={form.phone_number} onChange={handleChange} className={`mt-1 w-full border rounded-lg p-2 focus:outline-none ${errors.phone_number ? 'border-red-500' : 'border-[#90E0EF]'}`} />
+                      <input name="phone_number" inputMode="numeric" maxLength={15} value={form.phone_number} onChange={handleChange} className={`mt-1 w-full border rounded-lg p-2 focus:outline-none ${errors.phone_number ? 'border-red-500' : 'border-[#90E0EF]'}`} />
                       {errors.phone_number && <p className="text-xs text-red-600 mt-1">{errors.phone_number}</p>}
                     </div>
                     <div>

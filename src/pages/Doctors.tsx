@@ -63,10 +63,6 @@ const Doctors: React.FC = () => {
 
   const handleAdd = () => setIsAddOpen(true);
   const handleAddClose = () => setIsAddOpen(false);
-  const handleAddSubmit = async (data: CreateDoctorRequest) => {
-    await createDoctor.mutateAsync({ data });
-    setIsAddOpen(false);
-  };
 
   const handleEdit = (doctor: DoctorData) => {
     setSelectedDoctor(doctor);

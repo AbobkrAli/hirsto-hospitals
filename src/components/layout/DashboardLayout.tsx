@@ -45,9 +45,9 @@ const DashboardLayout: React.FC = () => {
   const { logout: zustandLogout, user, setUser } = useAppStore();
 
   // Fetch pharmacy data from API
-  const { data: pharmacyData }: { data: PharmacyData | undefined } = usePharmacyData();
-  // Fetch pharmacy logo from /pharmacies/me/logo
-  const { data: pharmacyLogoUrl } = usePharmacyLogo();
+  // const { data: pharmacyData }: { data: PharmacyData | undefined } = usePharmacyData();
+  // // Fetch pharmacy logo from /pharmacies/me/logo
+  // const { data: pharmacyLogoUrl } = usePharmacyLogo();
 
   // Handle screen size changes
   useEffect(() => {
@@ -251,7 +251,7 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           {/* User Profile Card - Only show when expanded */}
-          {sidebarOpen && (
+          {/* {sidebarOpen && (
             <div className="p-4 border-b border-gray-200">
               <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
                 <div className="relative">
@@ -271,7 +271,7 @@ const DashboardLayout: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Navigation */}
           <nav className="flex-1 p-4 overflow-y-auto">

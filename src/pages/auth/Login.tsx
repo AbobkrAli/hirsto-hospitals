@@ -68,36 +68,53 @@ const Login: React.FC = () => {
       console.log('DEBUG response', response);
 
       if (response) {
-        // Convert doctor data to user format for storage
+        // Extract hospital/pharmacy info from response
+        const pharmacy = response.pharmacy;
+        const legacyUser = response.user;
+
+        const id = (pharmacy?.id ?? legacyUser?.id) as number | undefined;
+        const name = (pharmacy?.name ?? legacyUser?.name ?? '') as string;
+        const email = (pharmacy?.email ?? (legacyUser?.email as string | undefined) ?? '') as string;
+        const bio = (pharmacy?.bio ?? '') as string;
+        const phone_number = (pharmacy?.phone_number ?? '') as string;
 
         const HospitalData = {
-          id: response.id || '',
-          name: response.name || '',
-          age: 0, // Not applicable for pharmacy
-          email: response.email || '',
-          bio: response.bio || '',
-          phone_number: response.phone_number || '',
-
+          id: id ?? 0,
+          name,
+          age: 0,
+          email,
+          bio,
+          phone_number,
         };
 
         // Store hospital data in localStorage
         localStorage.setItem('hospitalData', JSON.stringify(HospitalData));
-        // Save auth data (token and hospital data)
-        saveAuthData(response.access_token, {
-          ...HospitalData,
-          specialization: '', // Not applicable for pharmacy
-          profile_image_url: '', // Not applicable for pharmacy
-          created_at: '', // Not applicable for pharmacy
-          updated_at: '', // Not applicable for pharmacy
+        // Save auth data (token and hospital data mapped to User shape)
+        saveAuthData(response.access_token ?? null, {
+          id: HospitalData.id,
+          name: HospitalData.name,
+          age: 0,
+          email: HospitalData.email,
+          specialization: '',
+          bio: HospitalData.bio,
+          phone_number: HospitalData.phone_number,
+          profile_image_url: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         });
 
         // Also update Zustand store with required User fields
         login({
-          ...HospitalData,
+          id: HospitalData.id,
+          name: HospitalData.name,
+          age: 0,
+          email: HospitalData.email,
           specialization: '',
+          bio: HospitalData.bio,
+          phone_number: HospitalData.phone_number,
           profile_image_url: '',
-          created_at: '',
-          updated_at: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }, response.access_token);
 
         // Check if pharmacy is active
