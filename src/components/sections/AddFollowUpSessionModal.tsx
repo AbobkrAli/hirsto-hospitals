@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, Clock } from 'lucide-react';
 import Button from '../atoms/Button';
 import { useCreateFollowUpSession, type CreateFollowUpSessionRequest } from '../../services/followUpsService';
+import Select from 'react-select';
 
 interface AddFollowUpSessionModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
     treatment_adjustments: '',
     medications_prescribed: '',
     next_session_plan: '',
-    session_outcome: 'completed',
+    session_outcome: 'stable',
     patient_compliance: 'good',
     side_effects_reported: '',
   });
@@ -47,7 +48,7 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
 
   const required = (v: string | number) => String(v ?? '').trim() ? '' : 'This field is required';
   const allowedSessionTypes = ['in_person', 'remote', 'phone'];
-  const allowedSessionOutcomes = ['completed', 'declined', 'rescheduled', 'no_show'];
+  const allowedSessionOutcomes = ['improved', 'stable', 'declined', 'concerns_noted'];
   const allowedCompliance = ['excellent', 'good', 'fair', 'poor'];
 
   const validateField = (name: string, value: string | number): string => {
@@ -206,7 +207,32 @@ const AddFollowUpSessionModal: React.FC<AddFollowUpSessionModalProps> = ({ isOpe
                     </div>
                     <div>
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Session Outcome</label>
-                      <input name="session_outcome" value={form.session_outcome} onChange={handleChange} className="mt-1 w-full border rounded-lg p-2 focus:outline-none border-[#90E0EF]" />
+                      <Select
+                        classNamePrefix="react-select"
+                        options={[
+                          { value: 'improved', label: 'Improved' },
+                          { value: 'stable', label: 'Stable' },
+                          { value: 'declined', label: 'Declined' },
+                          { value: 'concerns_noted', label: 'Concerns Noted' },
+                        ]}
+                        value={(() => {
+                          const v = form.session_outcome;
+                          return [
+                            { value: 'improved', label: 'Improved' },
+                            { value: 'stable', label: 'Stable' },
+                            { value: 'declined', label: 'Declined' },
+                            { value: 'concerns_noted', label: 'Concerns Noted' },
+                          ].find(o => o.value === v) || null;
+                        })()}
+                        onChange={(opt) => setForm(prev => ({ ...prev, session_outcome: (opt as { value: string; label: string } | null)?.value || 'stable' }))}
+                        styles={{
+                          control: (provided) => ({ ...provided, border: '1px solid #90E0EF', borderRadius: '0.5rem', minHeight: '36px', boxShadow: 'none', '&:hover': { border: '1px solid #90E0EF' } }),
+                          option: (p, s) => ({ ...p, backgroundColor: s.isSelected ? '#03045E' : s.isFocused ? '#CAF0F8' : 'white', color: s.isSelected ? 'white' : '#1E3E72' }),
+                          menu: (p) => ({ ...p, border: '1px solid #90E0EF', borderRadius: '0.5rem' })
+                        }}
+                        placeholder="Select outcome"
+                        isClearable
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Patient Compliance</label>

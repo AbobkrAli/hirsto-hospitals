@@ -777,7 +777,7 @@ const HospitalAnalyticsDashboard = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              {hospitalData.hospital_name} Analytics 🏥
+              {hospitalData.hospital_name} Analytics
             </h1>
             <p className="text-gray-600 text-sm md:text-base">
               Comprehensive hospital performance dashboard
@@ -969,7 +969,7 @@ const HospitalAnalyticsDashboard = () => {
           </div>
         </div>
 
-        {/* Top Specializations Chart */}
+        {/* Top Specializations Chart (Pie) */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Top Specializations</h3>
@@ -977,13 +977,23 @@ const HospitalAnalyticsDashboard = () => {
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={summary.top_specializations} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={80} />
+              <RechartsPieChart>
                 <Tooltip />
-                <Bar dataKey="count" fill="#3B82F6" radius={[0, 4, 4, 0]} />
-              </BarChart>
+                <Legend />
+                <Pie
+                  data={summary.top_specializations}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={90}
+                  dataKey="count"
+                  nameKey="name"
+                  label
+                >
+                  {summary.top_specializations.map((_, index) => (
+                    <Cell key={`spec-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+              </RechartsPieChart>
             </ResponsiveContainer>
           </div>
         </div>
