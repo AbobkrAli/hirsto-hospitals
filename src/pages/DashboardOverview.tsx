@@ -97,7 +97,72 @@ const HospitalAnalyticsDashboard = () => {
           throw new Error('Missing hospital id');
         }
         const response = await api.get(`/hospitals/${hospital_id}/analytics`);
-        setHospitalData(response.data);
+        const raw = response.data || {};
+        const normalized: HospitalAnalytics = {
+          hospital_name: raw.hospital_name,
+          summary: {
+            total_doctors: raw.summary?.total_doctors ?? 0,
+            active_doctors: raw.summary?.active_doctors ?? 0,
+            total_appointments: raw.summary?.total_appointments ?? 0,
+            completed_appointments: raw.summary?.completed_appointments ?? 0,
+            upcoming_appointments: raw.summary?.upcoming_appointments ?? 0,
+            cancelled_appointments: raw.summary?.cancelled_appointments ?? 0,
+            total_patients: raw.summary?.total_patients ?? 0,
+            top_specializations: (raw.summary?.top_specializations ?? []).map((s: any) => ({
+              name: s?.name ?? s?.specialization ?? 'Unknown',
+              count: s?.count ?? 0,
+            })),
+            monthly_appointments: (raw.summary?.monthly_appointments ?? []).map((m: any) => ({
+              month: m?.month ?? '',
+              appointments: m?.appointments ?? m?.count ?? 0,
+            })),
+            surgery_analytics: {
+              total_surgeries: raw.summary?.surgery_analytics?.total_surgeries ?? 0,
+              success_rate_percentage: raw.summary?.surgery_analytics?.success_rate_percentage ?? 0,
+              average_surgery_duration: raw.summary?.surgery_analytics?.average_surgery_duration ?? 0,
+              total_surgery_revenue: raw.summary?.surgery_analytics?.total_surgery_revenue ?? 0,
+              emergency_surgeries: raw.summary?.surgery_analytics?.emergency_surgeries ?? 0,
+              most_common_surgeries: (raw.summary?.surgery_analytics?.most_common_surgeries ?? []).map((x: any) => ({
+                name: x?.name ?? x?.surgery ?? 'Unknown',
+                count: x?.count ?? 0,
+              })),
+            },
+            test_analytics: {
+              total_tests: raw.summary?.test_analytics?.total_tests ?? 0,
+              completed_tests: raw.summary?.test_analytics?.completed_tests ?? 0,
+              average_turnaround_hours: raw.summary?.test_analytics?.average_turnaround_hours ?? 0,
+              abnormal_results: raw.summary?.test_analytics?.abnormal_results ?? 0,
+              total_test_revenue: raw.summary?.test_analytics?.total_test_revenue ?? 0,
+              most_common_tests: (raw.summary?.test_analytics?.most_common_tests ?? []).map((x: any) => ({
+                name: x?.name ?? x?.test ?? 'Unknown',
+                count: x?.count ?? 0,
+              })),
+            },
+            follow_up_analytics: {
+              average_sessions_per_follow_up: raw.summary?.follow_up_analytics?.average_sessions_per_follow_up ?? 0,
+              patient_satisfaction_average: raw.summary?.follow_up_analytics?.patient_satisfaction_average ?? 0,
+              improvement_rate_percentage: raw.summary?.follow_up_analytics?.improvement_rate_percentage ?? 0,
+              active_follow_ups: raw.summary?.follow_up_analytics?.active_follow_ups ?? 0,
+              follow_up_types: (raw.summary?.follow_up_analytics?.follow_up_types ?? []).map((x: any) => ({
+                name: x?.name ?? x?.type ?? 'Unknown',
+                count: x?.count ?? 0,
+              })),
+            },
+          },
+          doctors_analytics: (raw.doctors_analytics ?? []).map((d: any) => ({
+            doctor_id: d?.doctor_id,
+            doctor_name: d?.doctor_name,
+            specialization: d?.specialization,
+            total_appointments: d?.total_appointments ?? 0,
+            completed_appointments: d?.completed_appointments ?? 0,
+            upcoming_appointments: d?.upcoming_appointments ?? 0,
+            cancelled_appointments: d?.cancelled_appointments ?? 0,
+            total_patients: d?.total_patients ?? 0,
+            average_rating: d?.average_rating ?? 0,
+            total_ratings: d?.total_ratings ?? 0,
+          })),
+        };
+        setHospitalData(normalized);
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
