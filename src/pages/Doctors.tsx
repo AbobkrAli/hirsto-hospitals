@@ -4,7 +4,7 @@ import Button from '../components/atoms/Button';
 import { DeleteConfirmationModal } from '../components/sections';
 import { InactivePharmacyMessage } from '../components';
 import { usePharmacyData } from '../hooks/usePharmacyData';
-import { useHospitalDoctors, useCreateDoctor, useUpdateDoctor, useDeleteDoctor, type DoctorData, type CreateDoctorRequest, type UpdateDoctorRequest } from '../services/doctorsService';
+import { useHospitalDoctors, useDeleteDoctor, type DoctorData } from '../services/doctorsService';
 import { useInsuranceCompanies } from '../hooks/useInsurance';
 import AddDoctorModal from '../components/sections/AddDoctorModal';
 import EditDoctorModal from '../components/sections/EditDoctorModal';
@@ -51,8 +51,6 @@ const Doctors: React.FC = () => {
 
   const { data: doctors = [], isLoading, error, refetch } = useHospitalDoctors();
 
-  const createDoctor = useCreateDoctor();
-  const updateDoctor = useUpdateDoctor();
   const deleteDoctor = useDeleteDoctor();
 
   const { data: insuranceCompanies = [] } = useInsuranceCompanies();
@@ -76,12 +74,7 @@ const Doctors: React.FC = () => {
     setIsEditOpen(false);
     setSelectedDoctor(null);
   };
-  const handleEditSubmit = async (data: UpdateDoctorRequest) => {
-    if (!selectedDoctor) return;
-    await updateDoctor.mutateAsync({ doctorId: selectedDoctor.id, data });
-    setIsEditOpen(false);
-    setSelectedDoctor(null);
-  };
+
 
   const handleDelete = (doctor: DoctorData) => {
     setSelectedDoctor(doctor);
