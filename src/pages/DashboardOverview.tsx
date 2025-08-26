@@ -19,6 +19,7 @@ import {
   Target
 } from 'lucide-react';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart as RechartsPieChart, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Pie } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Mock data based on the API structure
 const mockHospitalData = {
@@ -152,397 +153,445 @@ const HospitalAnalyticsDashboard = () => {
 
   // Modal Components
   const DoctorsModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-
     return (
-      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
-        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
-
-        <div className="bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-white">Doctors Performance Analytics</h2>
-                <p className="text-blue-100 text-sm mt-1">Comprehensive overview of all medical staff</p>
-              </div>
-              <button
-                onClick={onClose}
-                className="text-white hover:text-blue-200 bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all duration-200"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div className="p-6 overflow-y-auto max-h-[70vh]">
-            {/* Summary Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50  backdrop-blur-lg bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+            >
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-green-700 font-medium">Active Doctors</p>
-                    <p className="text-2xl font-bold text-green-800">{summary.active_doctors}</p>
+                    <h2 className="text-2xl font-bold text-white">Doctors Performance Analytics</h2>
+                    <p className="text-blue-100 text-sm mt-1">Comprehensive overview of all medical staff</p>
                   </div>
-                  <div className="p-3 bg-green-200 rounded-lg">
-                    <UserCheck className="w-5 h-5 text-green-700" />
-                  </div>
+                  <button
+                    onClick={onClose}
+                    className="text-white hover:text-blue-200 bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all duration-200"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-blue-700 font-medium">Avg Rating</p>
-                    <p className="text-2xl font-bold text-blue-800">
-                      {(doctors_analytics.reduce((acc, d) => acc + d.average_rating, 0) / doctors_analytics.length).toFixed(1)}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-blue-200 rounded-lg">
-                    <Star className="w-5 h-5 text-blue-700" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-purple-700 font-medium">Total Patients</p>
-                    <p className="text-2xl font-bold text-purple-800">
-                      {doctors_analytics.reduce((acc, d) => acc + d.total_patients, 0)}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-purple-200 rounded-lg">
-                    <Users className="w-5 h-5 text-purple-700" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Doctor Cards */}
-            <div className="grid gap-6">
-              {doctors_analytics.map((doctor, index) => {
-                const completionRate = ((doctor.completed_appointments / doctor.total_appointments) * 100).toFixed(1);
-                return (
-                  <div key={doctor.doctor_id} className="bg-gradient-to-r from-white to-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-4">
-
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">{doctor.doctor_name}</h3>
-                          <p className="text-blue-600 font-medium">{doctor.specialization}</p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                            <span className="text-sm font-medium text-gray-700">{doctor.average_rating}</span>
-                            <span className="text-sm text-gray-500">({doctor.total_ratings} reviews)</span>
-                          </div>
-                        </div>
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-green-700 font-medium">Active Doctors</p>
+                        <p className="text-2xl font-bold text-green-800">{summary.active_doctors}</p>
                       </div>
-                      <div className="text-right">
-                        <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {completionRate}% Completion Rate
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Calendar className="w-4 h-4 text-blue-600" />
-                          <p className="text-xs font-medium text-gray-600">Appointments</p>
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{doctor.total_appointments}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
-                            <div
-                              className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
-                              style={{ width: `${completionRate}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Users className="w-4 h-4 text-purple-600" />
-                          <p className="text-xs font-medium text-gray-600">Patients</p>
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{doctor.total_patients}</p>
-                        <p className="text-xs text-gray-500 mt-2">Unique patients served</p>
-                      </div>
-
-                      <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Clock className="w-4 h-4 text-orange-600" />
-                          <p className="text-xs font-medium text-gray-600">Upcoming</p>
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{doctor.upcoming_appointments}</p>
-                        <p className="text-xs text-gray-500 mt-2">Scheduled ahead</p>
-                      </div>
-
-                      <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Activity className="w-4 h-4 text-red-600" />
-                          <p className="text-xs font-medium text-gray-600">Cancelled</p>
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900">{doctor.cancelled_appointments}</p>
-                        <p className="text-xs text-gray-500 mt-2">Cancellation rate: {((doctor.cancelled_appointments / doctor.total_appointments) * 100).toFixed(1)}%</p>
+                      <div className="p-3 bg-green-200 rounded-lg">
+                        <UserCheck className="w-5 h-5 text-green-700" />
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
+
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-blue-700 font-medium">Avg Rating</p>
+                        <p className="text-2xl font-bold text-blue-800">
+                          {(doctors_analytics.reduce((acc, d) => acc + d.average_rating, 0) / doctors_analytics.length).toFixed(1)}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-blue-200 rounded-lg">
+                        <Star className="w-5 h-5 text-blue-700" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-purple-700 font-medium">Total Patients</p>
+                        <p className="text-2xl font-bold text-purple-800">
+                          {doctors_analytics.reduce((acc, d) => acc + d.total_patients, 0)}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-purple-200 rounded-lg">
+                        <Users className="w-5 h-5 text-purple-700" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Doctor Cards */}
+                <div className="grid gap-6">
+                  {doctors_analytics.map((doctor, index) => {
+                    const completionRate = ((doctor.completed_appointments / doctor.total_appointments) * 100).toFixed(1);
+                    return (
+                      <div key={doctor.doctor_id} className="bg-gradient-to-r from-white to-gray-50 rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-4">
+
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900">{doctor.doctor_name}</h3>
+                              <p className="text-blue-600 font-medium">{doctor.specialization}</p>
+                              <div className="flex items-center gap-1 mt-1">
+                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                <span className="text-sm font-medium text-gray-700">{doctor.average_rating}</span>
+                                <span className="text-sm text-gray-500">({doctor.total_ratings} reviews)</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              {completionRate}% Completion Rate
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Calendar className="w-4 h-4 text-blue-600" />
+                              <p className="text-xs font-medium text-gray-600">Appointments</p>
+                            </div>
+                            <p className="text-2xl font-bold text-gray-900">{doctor.total_appointments}</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                <div
+                                  className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                                  style={{ width: `${completionRate}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Users className="w-4 h-4 text-purple-600" />
+                              <p className="text-xs font-medium text-gray-600">Patients</p>
+                            </div>
+                            <p className="text-2xl font-bold text-gray-900">{doctor.total_patients}</p>
+                            <p className="text-xs text-gray-500 mt-2">Unique patients served</p>
+                          </div>
+
+                          <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Clock className="w-4 h-4 text-orange-600" />
+                              <p className="text-xs font-medium text-gray-600">Upcoming</p>
+                            </div>
+                            <p className="text-2xl font-bold text-gray-900">{doctor.upcoming_appointments}</p>
+                            <p className="text-xs text-gray-500 mt-2">Scheduled ahead</p>
+                          </div>
+
+                          <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Activity className="w-4 h-4 text-red-600" />
+                              <p className="text-xs font-medium text-gray-600">Cancelled</p>
+                            </div>
+                            <p className="text-2xl font-bold text-gray-900">{doctor.cancelled_appointments}</p>
+                            <p className="text-xs text-gray-500 mt-2">Cancellation rate: {((doctor.cancelled_appointments / doctor.total_appointments) * 100).toFixed(1)}%</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   };
 
   const SurgeriesModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-
     return (
-      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
-        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0  backdrop-blur-lg bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">Surgery Analytics</h2>
+                  <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-green-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-green-600">{summary.surgery_analytics.success_rate_percentage}%</p>
+                    <p className="text-sm text-gray-600">Success Rate</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-blue-600">{summary.surgery_analytics.average_surgery_duration} min</p>
+                    <p className="text-sm text-gray-600">Avg Duration</p>
+                  </div>
+                  <div className="bg-purple-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-purple-600">${summary.surgery_analytics.total_surgery_revenue.toLocaleString()}</p>
+                    <p className="text-sm text-gray-600">Total Revenue</p>
+                  </div>
+                </div>
 
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Surgery Analytics</h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="p-6 overflow-y-auto max-h-[70vh]">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              <div className="bg-green-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-green-600">{summary.surgery_analytics.success_rate_percentage}%</p>
-                <p className="text-sm text-gray-600">Success Rate</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Common Surgeries</h3>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={summary.surgery_analytics.most_common_surgeries}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#3B82F6" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-blue-600">{summary.surgery_analytics.average_surgery_duration} min</p>
-                <p className="text-sm text-gray-600">Avg Duration</p>
-              </div>
-              <div className="bg-purple-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-purple-600">${summary.surgery_analytics.total_surgery_revenue.toLocaleString()}</p>
-                <p className="text-sm text-gray-600">Total Revenue</p>
-              </div>
-            </div>
-
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Common Surgeries</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={summary.surgery_analytics.most_common_surgeries}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#3B82F6" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   };
 
   const TestsModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-
     return (
-      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
-        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
-
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Test Analytics</h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="p-6 overflow-y-auto max-h-[70vh]">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-blue-600">{summary.test_analytics.average_turnaround_hours}h</p>
-                <p className="text-sm text-gray-600">Avg Turnaround</p>
-              </div>
-              <div className="bg-red-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-red-600">{summary.test_analytics.abnormal_results}</p>
-                <p className="text-sm text-gray-600">Abnormal Results</p>
-              </div>
-              <div className="bg-green-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-green-600">${summary.test_analytics.total_test_revenue.toLocaleString()}</p>
-                <p className="text-sm text-gray-600">Total Revenue</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Distribution</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
-                      <Tooltip />
-                      <Legend />
-                      <Pie
-                        data={summary.test_analytics.most_common_tests}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        dataKey="count"
-                        nameKey="name"
-                      >
-                        {summary.test_analytics.most_common_tests.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0  backdrop-blur-lg bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">Test Analytics</h2>
+                  <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
               </div>
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-blue-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-blue-600">{summary.test_analytics.average_turnaround_hours}h</p>
+                    <p className="text-sm text-gray-600">Avg Turnaround</p>
+                  </div>
+                  <div className="bg-red-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-red-600">{summary.test_analytics.abnormal_results}</p>
+                    <p className="text-sm text-gray-600">Abnormal Results</p>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-green-600">${summary.test_analytics.total_test_revenue.toLocaleString()}</p>
+                    <p className="text-sm text-gray-600">Total Revenue</p>
+                  </div>
+                </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Common Tests</h3>
-                <div className="space-y-3">
-                  {summary.test_analytics.most_common_tests.map((test, index) => (
-                    <div key={test.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium text-gray-900">{test.name}</span>
-                      <span className="text-blue-600 font-semibold">{test.count}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Distribution</h3>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPieChart>
+                          <Tooltip />
+                          <Legend />
+                          <Pie
+                            data={summary.test_analytics.most_common_tests}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            dataKey="count"
+                            nameKey="name"
+                          >
+                            {summary.test_analytics.most_common_tests.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
                     </div>
-                  ))}
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Common Tests</h3>
+                    <div className="space-y-3">
+                      {summary.test_analytics.most_common_tests.map((test, index) => (
+                        <div key={test.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <span className="font-medium text-gray-900">{test.name}</span>
+                          <span className="text-blue-600 font-semibold">{test.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   };
 
   const FollowUpsModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-
     return (
-      <div className="fixed inset-0  flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-200">
-        <div className="fixed inset-0 -z-[10]  flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
-        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
-
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Follow-up Analytics</h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="p-6 overflow-y-auto max-h-[70vh]">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-2xl font-bold text-blue-600">{summary.follow_up_analytics.average_sessions_per_follow_up}</p>
-                <p className="text-sm text-gray-600">Avg Sessions</p>
-              </div>
-              <div className="bg-yellow-50 rounded-xl p-4 text-center">
-                <div className="flex items-center justify-center gap-1">
-                  <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                  <p className="text-2xl font-bold text-yellow-600">{summary.follow_up_analytics.patient_satisfaction_average}</p>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0  backdrop-blur-lg bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">Follow-up Analytics</h2>
+                  <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-                <p className="text-sm text-gray-600">Patient Satisfaction</p>
               </div>
-              <div className="bg-green-50 rounded-xl p-4 text-center">
-                <p className="text-2xl font-bold text-green-600">{summary.follow_up_analytics.improvement_rate_percentage}%</p>
-                <p className="text-sm text-gray-600">Improvement Rate</p>
-              </div>
-              <div className="bg-purple-50 rounded-xl p-4 text-center">
-                <p className="text-2xl font-bold text-purple-600">{summary.follow_up_analytics.active_follow_ups}</p>
-                <p className="text-sm text-gray-600">Active Follow-ups</p>
-              </div>
-            </div>
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-blue-50 rounded-xl p-4 text-center">
+                    <p className="text-2xl font-bold text-blue-600">{summary.follow_up_analytics.average_sessions_per_follow_up}</p>
+                    <p className="text-sm text-gray-600">Avg Sessions</p>
+                  </div>
+                  <div className="bg-yellow-50 rounded-xl p-4 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <Star className="w-5 h-5 text-yellow-500 fill-current" />
+                      <p className="text-2xl font-bold text-yellow-600">{summary.follow_up_analytics.patient_satisfaction_average}</p>
+                    </div>
+                    <p className="text-sm text-gray-600">Patient Satisfaction</p>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-4 text-center">
+                    <p className="text-2xl font-bold text-green-600">{summary.follow_up_analytics.improvement_rate_percentage}%</p>
+                    <p className="text-sm text-gray-600">Improvement Rate</p>
+                  </div>
+                  <div className="bg-purple-50 rounded-xl p-4 text-center">
+                    <p className="text-2xl font-bold text-purple-600">{summary.follow_up_analytics.active_follow_ups}</p>
+                    <p className="text-sm text-gray-600">Active Follow-ups</p>
+                  </div>
+                </div>
 
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Follow-up Types Distribution</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={summary.follow_up_analytics.follow_up_types}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="count" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Follow-up Types Distribution</h3>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={summary.follow_up_analytics.follow_up_types}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Area type="monotone" dataKey="count" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   };
 
   const AppointmentsModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-
     return (
-      <div className="fixed inset-0 !z-[60] flex items-center justify-center p-4 animate-in fade-in-0 duration-200">
-        <div className="fixed inset-0 -z-[10]  flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
-        <div className="fixed inset-0 -z-[10] bg-black opacity-45 backdrop-blur-sm flex items-center justify-center  p-4 animate-in fade-in-0 duration-200" />
-
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Appointments Overview</h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="p-6 overflow-y-auto max-h-[70vh]">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Appointments Trend</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={summary.monthly_appointments}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="appointments" stroke="#3B82F6" strokeWidth={3} />
-                    </LineChart>
-                  </ResponsiveContainer>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0  backdrop-blur-lg bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900">Appointments Overview</h2>
+                  <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
               </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Specializations</h3>
-                <div className="space-y-3">
-                  {summary.top_specializations.map((spec, index) => (
-                    <div key={spec.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                        <span className="font-medium text-gray-900">{spec.name}</span>
-                      </div>
-                      <span className="text-blue-600 font-semibold">{spec.count}</span>
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Appointments Trend</h3>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={summary.monthly_appointments}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip />
+                          <Line type="monotone" dataKey="appointments" stroke="#3B82F6" strokeWidth={3} />
+                        </LineChart>
+                      </ResponsiveContainer>
                     </div>
-                  ))}
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Specializations</h3>
+                    <div className="space-y-3">
+                      {summary.top_specializations.map((spec, index) => (
+                        <div key={spec.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                            <span className="font-medium text-gray-900">{spec.name}</span>
+                          </div>
+                          <span className="text-blue-600 font-semibold">{spec.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   };
 
