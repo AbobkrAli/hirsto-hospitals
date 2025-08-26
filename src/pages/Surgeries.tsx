@@ -235,38 +235,56 @@ const Surgeries: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-900">Surgery Bookings</h2>
           {isLoadingBookings && <span className="text-sm text-gray-500">Loading…</span>}
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Surgery</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
-              {bookings.map((b) => (
-                <tr key={b.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.patient_name} <span className="text-gray-500">({b.patient_email})</span></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.surgery?.name ?? b.surgery_id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(b.scheduled_date).toLocaleString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${b.status === 'completed' ? 'bg-green-100 text-green-800' : b.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{b.status}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button onClick={() => { setSelectedBooking(b); setIsBookingOpen(true); }} className="text-[#1E3E72] hover:text-blue-700 transition-colors" title="View booking">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {(!bookings || bookings.length === 0) && !isLoadingBookings && (
-          <div className="text-center py-8 text-sm text-gray-500">No bookings found</div>
+        {isLoadingBookings ? (
+          <div className="divide-y divide-gray-100">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="px-6 py-4">
+                <div className="grid grid-cols-5 gap-4 items-center animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-48" />
+                  <div className="h-4 bg-gray-200 rounded w-40" />
+                  <div className="h-4 bg-gray-200 rounded w-40" />
+                  <div className="h-4 bg-gray-200 rounded w-24" />
+                  <div className="h-6 bg-gray-200 rounded w-10 ml-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Surgery</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-100">
+                  {bookings.map((b) => (
+                    <tr key={b.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.patient_name} <span className="text-gray-500">({b.patient_email})</span></td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{b.surgery?.name ?? b.surgery_id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(b.scheduled_date).toLocaleString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${b.status === 'completed' ? 'bg-green-100 text-green-800' : b.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{b.status}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button onClick={() => { setSelectedBooking(b); setIsBookingOpen(true); }} className="text-[#1E3E72] hover:text-blue-700 transition-colors" title="View booking">
+                          <FileText className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {(!bookings || bookings.length === 0) && (
+              <div className="text-center py-8 text-sm text-gray-500">No bookings found</div>
+            )}
+          </>
         )}
       </div>
 
