@@ -6,6 +6,7 @@ import { useCreateFollowUp, type CreateFollowUpRequest } from '../../services/fo
 import { useHospitalSurgeries } from '../../services/surgeriesService';
 import { useHospitalMedicalTests } from '../../services/medicalTestsService';
 import Select from 'react-select';
+import { useHospitalDoctors } from '../../services/doctorsService';
 
 interface AddFollowUpModalProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ const AddFollowUpModal: React.FC<AddFollowUpModalProps> = ({ isOpen, onClose, on
   const createMutation = useCreateFollowUp();
   const { data: surgeries = [], isLoading: isLoadingSurgeries } = useHospitalSurgeries();
   const { data: tests = [], isLoading: isLoadingTests } = useHospitalMedicalTests();
+  const { data: doctors = [], isLoading: isLoadingDoctors } = useHospitalDoctors();
 
   useEffect(() => {
     if (isOpen) {
@@ -145,8 +147,7 @@ const AddFollowUpModal: React.FC<AddFollowUpModalProps> = ({ isOpen, onClose, on
             style={{ zIndex: 9999 }}
           >
             <div className="w-full max-w-3xl ">
-              <div className="relative backdrop-blur-xl rounded-2xl !max-h-[90vh] overflow-y-auto shadow-2xl border bg-white/90 border-[#90E0EF]/40 p-0 ">
-                <div className="absolute -inset-px rounded-2xl pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(202, 240, 248, 0.35), rgba(144, 224, 239, 0.15))' }} />
+              <div className="relative backdrop-blur-xl rounded-2xl !max-h-[90vh] overflow-y-auto overflow-x-hidden shadow-2xl border bg-white/90 border-[#90E0EF]/40 p-0 ">
                 <div className="relative p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
@@ -169,8 +170,24 @@ const AddFollowUpModal: React.FC<AddFollowUpModalProps> = ({ isOpen, onClose, on
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Doctor ID</label>
-                        <input name="doctor_id" type="number" min={1} value={form.doctor_id} onChange={handleChange} className={`mt-1 w-full border rounded-lg p-2 focus:outline-none ${errors.doctor_id ? 'border-red-500' : 'border-[#90E0EF]'}`} />
+                        <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Doctor</label>
+                        <Select
+                          classNamePrefix="react-select"
+                          isClearable={false}
+                          isLoading={isLoadingDoctors}
+                          options={doctors.map(d => ({ value: d.id, label: d.name }))}
+                          value={(() => {
+                            const id = form.doctor_id || 0;
+                            return id ? { value: id, label: doctors.find(d => d.id === id)?.name || String(id) } : null;
+                          })()}
+                          onChange={(opt: { value: number; label: string } | null) => setForm(prev => ({ ...prev, doctor_id: opt ? opt.value : 0 }))}
+                          styles={{
+                            control: (provided) => ({ ...provided, border: '1px solid #90E0EF', borderRadius: '0.5rem', minHeight: '36px', boxShadow: 'none', '&:hover': { border: '1px solid #90E0EF' } }),
+                            option: (p, s) => ({ ...p, backgroundColor: s.isSelected ? '#03045E' : s.isFocused ? '#CAF0F8' : 'white', color: s.isSelected ? 'white' : '#1E3E72' }),
+                            menu: (p) => ({ ...p, border: '1px solid #90E0EF', borderRadius: '0.5rem' })
+                          }}
+                          placeholder="Select a doctor"
+                        />
                         {errors.doctor_id && <p className="text-xs text-red-600 mt-1">{errors.doctor_id}</p>}
                       </div>
                       <div>
