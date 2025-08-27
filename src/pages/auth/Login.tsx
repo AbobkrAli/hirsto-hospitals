@@ -139,7 +139,7 @@ const Login: React.FC = () => {
         }, response.access_token);
 
         // Check if pharmacy is active
-        toast.success('Welcome back! Pharmacy login successful.');
+        toast.success('Welcome back! Hospital login successful.');
         // Small delay to ensure storage operations are complete
         setTimeout(() => {
           navigate('/dashboard');
@@ -213,7 +213,7 @@ const Login: React.FC = () => {
                 className="text-lg lg:text-xl text-[#1E3E72]/80 font-subtitles max-w-md mx-auto lg:mx-0"
                 variants={itemVariants}
               >
-                Your comprehensive pharmacy management platform for modern pharmaceutical practice
+                Your comprehensive Hospital management platform for modern pharmaceutical practice
               </motion.p>
             </div>
 
@@ -257,7 +257,7 @@ const Login: React.FC = () => {
             >
               <div className="text-center">
                 <div className="text-2xl font-bold font-headlines text-[#1E3E72]">5K+</div>
-                <div className="text-xs font-subtitles">Pharmacy Partners</div>
+                <div className="text-xs font-subtitles">Hospital Partners</div>
               </div>
               <div className="w-px h-8 bg-[#90E0EF]"></div>
               <div className="text-center">
@@ -324,7 +324,7 @@ const Login: React.FC = () => {
                           ? 'border-red-500'
                           : 'border-[#90E0EF]/50 hover:border-[#90E0EF]'
                           }`}
-                        placeholder={'pharmacy@example.com'}
+                        placeholder={'hospital@example.com'}
                       />
                     </div>
                     {((errors.email)) && (
