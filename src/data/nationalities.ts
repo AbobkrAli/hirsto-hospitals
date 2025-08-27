@@ -89,7 +89,7 @@ export const nationalityOptions: NationalityOption[] = [
   { value: 'iranian', label: 'Iranian' },
   { value: 'iraqi', label: 'Iraqi' },
   { value: 'irish', label: 'Irish' },
-  { value: 'israeli', label: 'Israeli' },
+  { value: 'palestinian', label: 'Palestinian' },
   { value: 'italian', label: 'Italian' },
   { value: 'ivorian', label: 'Ivorian' },
   { value: 'jamaican', label: 'Jamaican' },

@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import Select from 'react-select';
-import type { MultiValue } from 'react-select';
+import type { MultiValue, SingleValue } from 'react-select';
+import { nationalityOptions } from '../../data/nationalities';
+import { languageOptions } from '../../data/languages';
+import { specializationOptions } from '../../data/specializations';
 import Button from '../atoms/Button';
 import { useCreateDoctor, type CreateDoctorRequest } from '../../services/doctorsService';
 import type { InsuranceCompany } from '../../services/insuranceService';
@@ -35,6 +38,7 @@ const AddDoctorModal: React.FC<AddDoctorModalProps> = ({ isOpen, onClose, onSucc
     insurance_company_ids: [],
   });
   const [selectedInsurances, setSelectedInsurances] = useState<MultiValue<InsuranceOption>>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<MultiValue<{ value: string; label: string }>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -89,10 +93,24 @@ const AddDoctorModal: React.FC<AddDoctorModalProps> = ({ isOpen, onClose, onSucc
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target as { name: string; value: string };
-    const casted = name === 'age' || name === 'years_of_experience' ? Number(value) : value;
-    setForm((prev) => ({ ...prev, [name]: casted as any }));
-    const err = validateField(name, casted as any);
+    const casted: string | number = name === 'age' || name === 'years_of_experience' ? Number(value) : value;
+    setForm((prev) => ({ ...prev, [name]: casted }));
+    const err = validateField(name, casted);
     setErrors((prev) => ({ ...prev, [name]: err }));
+  };
+
+  const handleSpecializationChange = (opt: SingleValue<{ value: string; label: string }>) => {
+    setForm((prev) => ({ ...prev, specialization: opt?.value || '' }));
+  };
+
+  const handleNationalityChange = (opt: SingleValue<{ value: string; label: string }>) => {
+    setForm((prev) => ({ ...prev, nationality: opt?.value || '' }));
+  };
+
+  const handleLanguagesChange = (opts: MultiValue<{ value: string; label: string }>) => {
+    setSelectedLanguages(opts);
+    const joined = (opts || []).map(o => o.value).join(', ');
+    setForm((prev) => ({ ...prev, languages: joined }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,7 +120,7 @@ const AddDoctorModal: React.FC<AddDoctorModalProps> = ({ isOpen, onClose, onSucc
     const phoneToValidate: Array<keyof CreateDoctorRequest> = ['phone_number'];
     const newErrors: Record<string, string> = {};
     [...fieldsToValidate, ...numericToValidate, ...phoneToValidate].forEach((key) => {
-      const val = (form as any)[key];
+      const val = form[key] as unknown as string | number;
       const err = validateField(key as string, val);
       if (err) newErrors[key as string] = err;
     });
@@ -180,13 +198,19 @@ const AddDoctorModal: React.FC<AddDoctorModalProps> = ({ isOpen, onClose, onSucc
                     </div>
                     <div>
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Specialization</label>
-                      <input name="specialization" value={form.specialization} onChange={handleChange} className={`mt-1 w-full border rounded-lg p-2 focus:outline-none ${errors.specialization ? 'border-red-500' : 'border-[#90E0EF]'}`} />
+                      <Select
+                        options={specializationOptions}
+                        value={specializationOptions.find(o => o.value === form.specialization) || null}
+                        onChange={handleSpecializationChange}
+                        placeholder="Select specialization..."
+                        classNamePrefix="react-select"
+                        styles={{
+                          control: (p) => ({ ...p, border: '1px solid #90E0EF', borderRadius: '0.75rem', minHeight: '44px', boxShadow: 'none' })
+                        }}
+                      />
                       {errors.specialization && <p className="text-xs text-red-600 mt-1">{errors.specialization}</p>}
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Profile Image URL</label>
-                      <input name="profile_image_url" value={form.profile_image_url} onChange={handleChange} className="mt-1 w-full border border-[#90E0EF] rounded-lg p-2 focus:outline-none" />
-                    </div>
+
                     <div>
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Location</label>
                       <input name="location" value={form.location} onChange={handleChange} className="mt-1 w-full border border-[#90E0EF] rounded-lg p-2 focus:outline-none" />
@@ -198,11 +222,29 @@ const AddDoctorModal: React.FC<AddDoctorModalProps> = ({ isOpen, onClose, onSucc
                     </div>
                     <div>
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Nationality</label>
-                      <input name="nationality" value={form.nationality} onChange={handleChange} className="mt-1 w-full border border-[#90E0EF] rounded-lg p-2 focus:outline-none" />
+                      <Select
+                        options={nationalityOptions}
+                        value={nationalityOptions.find(o => o.value === form.nationality) || null}
+                        onChange={handleNationalityChange}
+                        placeholder="Select nationality..."
+                        classNamePrefix="react-select"
+                        styles={{ control: (p) => ({ ...p, border: '1px solid #90E0EF', borderRadius: '0.75rem', minHeight: '44px', boxShadow: 'none' }) }}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Languages</label>
-                      <input name="languages" value={form.languages} onChange={handleChange} className="mt-1 w-full border border-[#90E0EF] rounded-lg p-2 focus:outline-none" />
+                      <Select
+                        isMulti
+                        options={languageOptions}
+                        value={selectedLanguages}
+                        onChange={handleLanguagesChange}
+                        placeholder="Select languages..."
+                        classNamePrefix="react-select"
+                        styles={{
+                          control: (p) => ({ ...p, border: '1px solid #90E0EF', borderRadius: '0.75rem', minHeight: '44px', boxShadow: 'none' }),
+                          multiValue: (p) => ({ ...p, backgroundColor: '#CAF0F8', borderRadius: '0.5rem' })
+                        }}
+                      />
                     </div>
                     <div className="md:col-span-2">
                       <label className="block text-sm font-semibold font-subtitles text-[#1E3E72]">Bio</label>
