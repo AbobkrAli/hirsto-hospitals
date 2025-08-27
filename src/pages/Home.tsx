@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 import PharmacyNavbar from '../components/PharmacyNavbar';
-import PharmacyHero from '../sections/PharmacyHero';
-import PharmacyProblem from '../sections/PharmacyProblem';
-import PharmacySolution from '../sections/PharmacySolution';
-import PharmacyFeatures from '../sections/PharmacyFeatures';
-import PharmacyHowItWorks from '../sections/PharmacyHowItWorks';
-import PharmacyCaseStudy from '../sections/PharmacyCaseStudy';
-import PharmacyPackages from '../sections/PharmacyPackages';
-import PharmacyCTA from '../sections/PharmacyCTA';
+
+
 import Footer from '../components/Footer';
+import HeroSection from '../sections/HeroSection';
+import ChallengeSection from '../sections/ChallengeSection';
+import IntroductionSection from '../sections/IntroductionSection';
+import FeaturesSection from '../sections/FeaturesSection';
+import PackagesSection from '../sections/PackagesSection';
+import WhyPartnerSection from '../sections/WhyPartnerSection';
+import CTASection from '../sections/CTASection';
 
 const Home = () => {
   useEffect(() => {
@@ -22,30 +23,14 @@ const Home = () => {
     <div className="min-h-screen w-full overflow-x-hidden bg-white">
       {/* Navbar */}
       <PharmacyNavbar />
-      
-      {/* Hero Section */}
-      <PharmacyHero />
 
-      {/* Problem Section */}
-      <PharmacyProblem />
-
-      {/* Solution Section */}
-      <PharmacySolution />
-
-      {/* Features Section */}
-      <PharmacyFeatures />
-
-      {/* How It Works Section */}
-      <PharmacyHowItWorks />
-
-      {/* Case Study Section */}
-      <PharmacyCaseStudy />
-
-      {/* Packages Section */}
-      <PharmacyPackages />
-
-      {/* CTA Section */}
-      <PharmacyCTA />
+      <HeroSection />
+      <ChallengeSection />
+      <IntroductionSection />
+      <FeaturesSection />
+      <PackagesSection />
+      <WhyPartnerSection />
+      <CTASection />
 
       {/* Footer */}
       <Footer />

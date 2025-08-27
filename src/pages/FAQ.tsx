@@ -24,54 +24,48 @@ const FAQ = () => {
 
   const faqData = [
     {
-      category: "About the Partnership & Business Model",
+      category: "General Questions",
       questions: [
         {
-          question: "What exactly do you mean by a 'Guaranteed Sales Channel'? How is it different from a regular delivery app?",
-          answer: `A "Guaranteed Sales Channel" is the core value of our partnership. Unlike regular delivery apps that may send you random, unconfirmed orders, Hirsto sends you\n only confirmed, prepaid e-prescriptions issued by licensed doctors on our platform. This means every order you receive is a 100% guaranteed sale that is already paid for by the customer; your only job is to prepare it for delivery.`
+          question: "What is HIRSTO Hospital OS?",
+          answer: "HIRSTO is a comprehensive, AI-powered hospital operating system designed to streamline clinical workflows, automate administrative tasks, and improve patient outcomes. It integrates various modules like EMR, telemedicine, billing, and analytics into a single, user-friendly platform."
         },
         {
-          question: "My pharmacy is struggling with competition from large chains and online platforms. How does Hirsto help me compete?",
-          answer: `We understand that individual pharmacies face an uneven battle on the digital front. Hirsto is designed to be your digital lifeblood by providing you with the sophisticated technology and logistics infrastructure that is typically only available to large chains. We give you an immediate e-commerce presence, manage a secure payment gateway, and handle all delivery logistics , allowing you to compete effectively in the digital marketplace and serve a much wider geographic area without the massive upfront investment.`
+          question: "How does the AI-powered Clinical Decision Support (CDSS) work?",
+          answer: "Our CDSS analyzes patient data in real-time to provide evidence-based recommendations to clinicians. It can suggest potential diagnoses, flag drug interactions, alert staff to abnormal vital signs, and recommend appropriate care pathways, helping to reduce medical errors and improve quality of care."
         },
-        {
-          question: "How do you ensure fair competition on the platform? Will you just prioritize the big pharmacy chains?",
-          answer: `Order routing is based on a smart algorithm that considers multiple factors, not just the size of the pharmacy. These factors include the patient's location, the real-time availability of the medication in your inventory (for advanced partners), and your partnership tier. Furthermore, partners on the "Partner" and "Health Hub" tiers receive\n priority placement in search results, giving them a competitive advantage.`
-        }
       ]
     },
     {
       category: "Operational & Technical Questions",
       questions: [
+
         {
-          question: "I don't have a technical team or an IT department. Is the system difficult to set up and use?",
-          answer: `Not at all. The system is designed for simplicity. For our standard partnership tiers, we provide you with a pre-configured tablet with the "Hirsto Order Management System" already installed. The interface is extremely simple, with a single main screen showing "New Orders," "In-Progress Orders," and "Ready for Pickup". We handle all the technical complexity so you can focus on your core business.`
+          question: "Is the platform secure and compliant with regulations like HIPAA?",
+          answer: "Absolutely. Security is our top priority. The HIRSTO platform is built on a secure, cloud-based infrastructure with end-to-end encryption. We are fully compliant with HIPAA and other international healthcare data protection regulations to ensure patient data is always safe."
         },
         {
-          question: "How does the delivery process work? Do I need to hire my own drivers?",
-          answer: `No, you do not need to hire any drivers. Hirsto manages the entire delivery and logistics process. When you prepare an order and press the "Ready for Pickup" button on the tablet, our system automatically dispatches the nearest Hirsto driver to your pharmacy to collect the order and deliver it to the customer.`
+          question: "Can HIRSTO integrate with our existing hospital systems?",
+          answer: "Yes. We have designed HIRSTO with interoperability in mind. Our system can integrate with most existing EMRs, LIS, and PACS systems using standard protocols like HL7 and FHIR. Our implementation team will work with you to ensure a seamless integration process."
+        },
+      ]
+    },
+    {
+      category: "Technical Questions",
+      questions: [
+
+        {
+          question: "What kind of support do you offer after implementation?",
+          answer: "We offer 24/7 technical support to all our partners. You will have a dedicated account manager and access to our online knowledge base, training materials, and a responsive helpdesk team to ensure your hospital gets the most out of our platform."
         },
         {
-          question: "How long does the entire onboarding and setup process take?",
-          answer: `We follow a clear, structured timeline managed by your dedicated Partner Success Manager. A typical timeline is:\n Week 1 for account setup and staff training;\n Week 2 for a trial run with test orders; and Week 3 for the full official launch.`
+          question: "How are automated clinical pathways customized for our hospital?",
+          answer: "Our clinical team works with your department heads to map out your existing care protocols. We then digitize and automate these pathways within the HIRSTO system. You can customize everything from automated appointment scheduling and patient reminders to remote monitoring alerts and educational content delivery."
         }
       ]
     },
     {
       category: "Data, Analytics, and Privacy",
-      questions: [
-        {
-          question: "How does the 'Inventory and Demand Analytics Dashboard' work? Are you sharing my sales data with my competitors?",
-          answer: `This is a key feature that distinguishes us. The dashboard works by analyzing\n anonymized and aggregated prescription data within a specific geographic area. We\n never share your individual, identifiable sales or inventory data with other pharmacies. The insights are about community-level trends. For example, the system might tell you, "We expect demand for children's medicine to increase by 20% in your area next month," helping you proactively manage your stock without revealing your specific business data to anyone.`
-        },
-        {
-          question: "What is required for the deep API integration mentioned in the advanced plans?",
-          answer: `The API integration is for our "Health Hub" partners and allows the Hirsto platform to see your stock levels in real-time, ensuring we only send you orders for medications you currently have. After signing the agreement, we schedule a technical kick-off meeting between our team and your technical contact to facilitate a smooth integration process.`
-        }
-      ]
-    },
-    {
-      category: "Advanced Partnership (\"Health Hub\")",
       questions: [
         {
           question: "What is the 'Hirsto Health Hub' feature exactly?",
