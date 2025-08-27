@@ -319,27 +319,19 @@ export const getAuthData = (): { token: string | null; user: User | null } => {
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
   try {
-    const userStr = localStorage.getItem('user');
-    const userType = localStorage.getItem('userType');
-    
-    if (!userStr) return false;
-    
-    // Try to parse the user data to ensure it's valid
-    const user = JSON.parse(userStr);
-    
-    // For branches, we don't require email since they don't have one
-    if (userType === 'branch') {
-      return !!(user && user.id && user.name);
-    }
-    
-    // For pharmacies, we require email
-    return !!(user && user.id && user.email);
-  } catch (error) {
-    // If there's an error parsing, clear the corrupted data
-    console.error('Error checking authentication:', error);
-    localStorage.removeItem('user');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userType');
+    // Prefer Zustand persisted storage
+    const persisted = localStorage.getItem('histro-app-storage');
+    if (!persisted) return false;
+    const parsed = JSON.parse(persisted) as { state?: { isAuthenticated?: boolean; token?: string | null; user?: unknown } };
+    const state = parsed?.state;
+
+    // If the flag exists, trust it
+    if (typeof state?.isAuthenticated === 'boolean') return state.isAuthenticated;
+
+    // Fallback: consider user+token presence as authenticated
+    return Boolean(state?.token && state?.user);
+  } catch {
+    // If there's an error parsing, consider unauthenticated
     return false;
   }
 };

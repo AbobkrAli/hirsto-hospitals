@@ -69,14 +69,35 @@ const Login: React.FC = () => {
 
       if (response) {
         // Extract hospital/pharmacy info from response
-        const pharmacy = response.pharmacy;
-        const legacyUser = response.user;
+        const root = response as unknown as Record<string, unknown>;
+        const pharmacy = (root?.pharmacy as Record<string, unknown> | undefined)
+          || (root?.hospital as Record<string, unknown> | undefined)
+          || root; // some APIs return the entity at the top level
 
-        const id = (pharmacy?.id ?? legacyUser?.id) as number | undefined;
-        const name = (pharmacy?.name ?? legacyUser?.name ?? '') as string;
-        const email = (pharmacy?.email ?? (legacyUser?.email as string | undefined) ?? '') as string;
-        const bio = (pharmacy?.bio ?? '') as string;
-        const phone_number = (pharmacy?.phone_number ?? '') as string;
+        const legacyUser = root?.user as Record<string, unknown> | undefined;
+
+        const id = (pharmacy?.id as number | undefined)
+          ?? (pharmacy?.hospital_id as number | undefined)
+          ?? (legacyUser?.id as number | undefined)
+          ?? (root?.id as number | undefined);
+
+        const name = (pharmacy?.name as string | undefined)
+          ?? (legacyUser?.name as string | undefined)
+          ?? (root?.name as string | undefined)
+          ?? '';
+
+        const email = (pharmacy?.email as string | undefined)
+          ?? (legacyUser?.email as string | undefined)
+          ?? (root?.email as string | undefined)
+          ?? '';
+
+        const bio = (pharmacy?.bio as string | undefined)
+          ?? (root?.bio as string | undefined)
+          ?? '';
+
+        const phone_number = (pharmacy?.phone_number as string | undefined)
+          ?? (root?.phone_number as string | undefined)
+          ?? '';
 
         const HospitalData = {
           id: id ?? 0,

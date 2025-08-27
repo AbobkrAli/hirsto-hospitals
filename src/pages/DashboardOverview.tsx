@@ -98,6 +98,11 @@ const HospitalAnalyticsDashboard = () => {
         }
         const response = await api.get(`/hospitals/${hospital_id}/analytics`);
         const raw = response.data || {};
+        console.log('Raw analytics data:', raw);
+        console.log('Test analytics:', raw.summary?.test_analytics);
+        console.log('Most common tests:', raw.summary?.test_analytics?.most_common_tests);
+        console.log('Surgery analytics:', raw.summary?.surgery_analytics);
+        console.log('Most common surgeries:', raw.summary?.surgery_analytics?.most_common_surgeries);
         const normalized: HospitalAnalytics = {
           hospital_name: raw.hospital_name,
           summary: {
@@ -531,15 +536,24 @@ const HospitalAnalyticsDashboard = () => {
 
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Common Surgeries</h3>
                 <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={summary.surgery_analytics.most_common_surgeries}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="count" fill="#3B82F6" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {summary.surgery_analytics.most_common_surgeries && summary.surgery_analytics.most_common_surgeries.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={summary.surgery_analytics.most_common_surgeries}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#3B82F6" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      <div className="text-center">
+                        <Activity className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                        <p>No surgery data available</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -595,36 +609,52 @@ const HospitalAnalyticsDashboard = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Distribution</h3>
                     <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RechartsPieChart>
-                          <Tooltip />
-                          <Legend />
-                          <Pie
-                            data={summary.test_analytics.most_common_tests}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            dataKey="count"
-                            nameKey="name"
-                          >
-                            {summary.test_analytics.most_common_tests.map((_, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                        </RechartsPieChart>
-                      </ResponsiveContainer>
+                      {summary.test_analytics.most_common_tests && summary.test_analytics.most_common_tests.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RechartsPieChart>
+                            <Tooltip />
+                            <Legend />
+                            <Pie
+                              data={summary.test_analytics.most_common_tests}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              dataKey="count"
+                              nameKey="name"
+                            >
+                              {summary.test_analytics.most_common_tests.map((_, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                          </RechartsPieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-gray-500">
+                          <div className="text-center">
+                            <TestTube className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                            <p>No test data available</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Common Tests</h3>
                     <div className="space-y-3">
-                      {summary.test_analytics.most_common_tests.map((test) => (
-                        <div key={test.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <span className="font-medium text-gray-900">{test.name}</span>
-                          <span className="text-blue-600 font-semibold">{test.count}</span>
+                      {summary.test_analytics.most_common_tests && summary.test_analytics.most_common_tests.length > 0 ? (
+                        summary.test_analytics.most_common_tests.map((test) => (
+                          <div key={test.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span className="font-medium text-gray-900">{test.name}</span>
+                            <span className="text-blue-600 font-semibold">{test.count}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <TestTube className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                          <p>No test data available</p>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                 </div>
